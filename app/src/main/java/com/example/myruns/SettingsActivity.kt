@@ -10,10 +10,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
+import android.text.Editable
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModelProvider
 import java.io.File
 
 
@@ -21,9 +25,18 @@ class SettingsActivity : AppCompatActivity() {
     private val cameraRequestCode: Int = 1
     private val storageRequestCode: Int = 2
 
+    private lateinit var settingsViewModel: SettingsViewModel
+
+//    private lateinit var profilePhotoView: ImageView
+    private lateinit var nameView: EditText
+//    private lateinit var emailView: EditText
+//    private lateinit var phoneNumberView: EditText
+//    private lateinit var classYearView: EditText
+//    private lateinit var majorView: EditText
+
     private val imageCaptureLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) { // successfully captured photo
             val data: Intent? = result.data
             if (data != null && data.extras != null) {
@@ -37,6 +50,13 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        settingsViewModel.load(this)
+
+        initializeViews()
+        initializeObservers()
+
+
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), storageRequestCode)
 
         findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
@@ -47,6 +67,10 @@ class SettingsActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.CAMERA),
                 cameraRequestCode
             )
+        }
+
+        findViewById<Button>(R.id.confirm_settings).setOnClickListener {
+            saveSettings()
         }
     }
 
@@ -67,20 +91,6 @@ class SettingsActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        } else if (requestCode == storageRequestCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(
-                    this,
-                    "Storage Permission Granted",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(
-                    this,
-                    "Storage Permission Denied",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
         }
     }
 
@@ -97,16 +107,50 @@ class SettingsActivity : AppCompatActivity() {
     private fun setProfileImage(image: Bitmap) {
         var profilePhoto: ImageView = findViewById(R.id.profile_photo)
         profilePhoto.setImageBitmap(image)
-
-        // save the image
-        val imageFileName = "profile_image.jpg"
-        val imageFile = File(getExternalFilesDir(null), imageFileName)
-//
-//        val tempImgFile = File(getExternalFilesDir(null), "profile_image.jpg")
-//        val tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns", tempImgFile)
-//
-//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-//        cameraResult.launch(intent)
     }
+
+    private fun initializeViews() {
+//        profilePhotoView = findViewById(R.id.profile_photo)
+        nameView = findViewById(R.id.name_input)
+//        emailView = findViewById(R.id.email_input)
+//        phoneNumberView = findViewById(R.id.phone_input)
+//        classYearView = findViewById(R.id.class_input)
+//        majorView = findViewById(R.id.major_input)
+    }
+
+    private fun initializeObservers() {
+        settingsViewModel.profilePhoto.observe(this) {
+
+        }
+        settingsViewModel.name.observe(this) {
+            nameView.text = Editable.Factory.getInstance().newEditable(it)
+        }
+        settingsViewModel.email.observe(this) {
+            
+        }
+        settingsViewModel.gender.observe(this) {
+
+        }
+        settingsViewModel.phoneNumber.observe(this) {
+
+        }
+        settingsViewModel.classYear.observe(this) {
+
+        }
+        settingsViewModel.major.observe(this) {
+
+        }
+    }
+
+    private fun saveSettings() {
+//        settingsViewModel.profilePhoto.value
+        settingsViewModel.name.value = nameView.text.toString()
+//        settingsViewModel.email
+//        settingsViewModel.phoneNumber
+//        settingsViewModel.classYear
+//        settingsViewModel.major
+
+        settingsViewModel.save(this)
+    }
+
 }
