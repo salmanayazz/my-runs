@@ -128,25 +128,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <RadioButton
+                        android:id="@+id/radio_gender_female"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Female" />
 
+                    <RadioButton
+                        android:id="@+id/radio_gender_male"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Male" />
 
-                        <RadioButton
-                            android:id="@+id/radio_gender_female"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Female" />
-
-                        <RadioButton
-                            android:id="@+id/radio_gender_male"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Male" />
-
-                        <RadioButton
-                            android:id="@+id/radio_gender_other"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Other" />
+                    <RadioButton
+                        android:id="@+id/radio_gender_other"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Other" />
 
                 </RadioGroup>
 

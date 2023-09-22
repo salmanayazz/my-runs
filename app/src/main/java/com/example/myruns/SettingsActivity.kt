@@ -21,6 +21,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
+import java.lang.NumberFormatException
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -31,10 +32,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private val profilePhotoView by lazy { findViewById<ImageView>(R.id.profile_photo) }
     private val nameView by lazy { findViewById<EditText>(R.id.name_input) }
-//    private lateinit var emailView: EditText
-//    private lateinit var phoneNumberView: EditText
-//    private lateinit var classYearView: EditText
-//    private lateinit var majorView: EditText
+    private val emailView by lazy { findViewById<EditText>(R.id.email_input) }
+    private val phoneNumberView by lazy { findViewById<EditText>(R.id.phone_input) }
+    private val classYearView by lazy { findViewById<EditText>(R.id.class_input) }
+    private val majorView by lazy { findViewById<EditText>(R.id.major_input) }
     private val genderViewFemale by lazy { findViewById<RadioButton>(R.id.radio_gender_female) }
     private val genderViewMale by lazy { findViewById<RadioButton>(R.id.radio_gender_male) }
     private val genderViewOther by lazy { findViewById<RadioButton>(R.id.radio_gender_other) }
@@ -108,11 +109,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setProfileImage(image: Bitmap) {
-        var profilePhoto: ImageView = findViewById(R.id.profile_photo)
-        profilePhoto.setImageBitmap(image)
-    }
-
     private fun initializeObservers() {
         settingsViewModel.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
@@ -121,7 +117,7 @@ class SettingsActivity : AppCompatActivity() {
             nameView.text = Editable.Factory.getInstance().newEditable(it)
         }
         settingsViewModel.email.observe(this) {
-            
+            emailView.text = Editable.Factory.getInstance().newEditable(it)
         }
         settingsViewModel.gender.observe(this) {
             when (it){
@@ -129,25 +125,34 @@ class SettingsActivity : AppCompatActivity() {
                 1 -> genderViewMale.isChecked = true;
                 2 -> genderViewOther.isChecked = true;
             }
-
         }
         settingsViewModel.phoneNumber.observe(this) {
-
+            phoneNumberView.text = Editable.Factory.getInstance().newEditable(it)
         }
         settingsViewModel.classYear.observe(this) {
-
+            classYearView.text = Editable.Factory.getInstance().newEditable(it.toString())
         }
         settingsViewModel.major.observe(this) {
-
+            majorView.text = Editable.Factory.getInstance().newEditable(it)
         }
     }
 
     private fun saveSettings() {
         settingsViewModel.name.value = nameView.text.toString()
-//        settingsViewModel.email
-//        settingsViewModel.phoneNumber
-//        settingsViewModel.classYear
-//        settingsViewModel.major
+        settingsViewModel.email.value = emailView.text.toString()
+        settingsViewModel.phoneNumber.value = phoneNumberView.text.toString()
+        try {
+            settingsViewModel.classYear.value = (classYearView.text.toString()).toInt()
+        } catch (e: NumberFormatException) {
+            e.printStackTrace()
+            Toast.makeText(
+                this,
+                "Class year number is too large", // TODO
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        settingsViewModel.major.value = majorView.text.toString()
 
         if (genderViewFemale.isChecked) {
             settingsViewModel.gender.value = 0;

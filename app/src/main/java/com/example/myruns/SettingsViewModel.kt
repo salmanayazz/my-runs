@@ -48,10 +48,16 @@ class SettingsViewModel : ViewModel() {
             outputStream.close()
 
             // save the photo to a separate file
-            val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
-            val profilePhotoOutputStream = FileOutputStream(profilePhotoFile)
-            profilePhoto.value?.compress(Bitmap.CompressFormat.JPEG, 100, profilePhotoOutputStream)
-            profilePhotoOutputStream.close()
+            if (profilePhoto.value != null) { // don't create img file if null
+                val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
+                val profilePhotoOutputStream = FileOutputStream(profilePhotoFile)
+                profilePhoto.value?.compress(
+                    Bitmap.CompressFormat.JPEG,
+                    100,
+                    profilePhotoOutputStream
+                )
+                profilePhotoOutputStream.close()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(
@@ -85,11 +91,9 @@ class SettingsViewModel : ViewModel() {
                 inputStream.close()
             }
 
-            if (profilePhoto.value != null) { // don't create img file if null
-                val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
-                if (profilePhotoFile.exists()) {
-                    profilePhoto.value = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
-                }
+            val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
+            if (profilePhotoFile.exists()) {
+                profilePhoto.value = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
             }
         } catch (e: Exception) {
             e.printStackTrace()
