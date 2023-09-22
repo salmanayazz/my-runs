@@ -11,8 +11,10 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.text.Editable
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -27,12 +29,15 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var settingsViewModel: SettingsViewModel
 
-    private lateinit var profilePhotoView: ImageView
-    private lateinit var nameView: EditText
+    private val profilePhotoView by lazy { findViewById<ImageView>(R.id.profile_photo) }
+    private val nameView by lazy { findViewById<EditText>(R.id.name_input) }
 //    private lateinit var emailView: EditText
 //    private lateinit var phoneNumberView: EditText
 //    private lateinit var classYearView: EditText
 //    private lateinit var majorView: EditText
+    private val genderViewFemale by lazy { findViewById<RadioButton>(R.id.radio_gender_female) }
+    private val genderViewMale by lazy { findViewById<RadioButton>(R.id.radio_gender_male) }
+    private val genderViewOther by lazy { findViewById<RadioButton>(R.id.radio_gender_other) }
 
     private val imageCaptureLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -53,7 +58,6 @@ class SettingsActivity : AppCompatActivity() {
         settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         settingsViewModel.load(this)
 
-        initializeViews()
         initializeObservers()
 
 
@@ -109,15 +113,6 @@ class SettingsActivity : AppCompatActivity() {
         profilePhoto.setImageBitmap(image)
     }
 
-    private fun initializeViews() {
-        profilePhotoView = findViewById(R.id.profile_photo)
-        nameView = findViewById(R.id.name_input)
-//        emailView = findViewById(R.id.email_input)
-//        phoneNumberView = findViewById(R.id.phone_input)
-//        classYearView = findViewById(R.id.class_input)
-//        majorView = findViewById(R.id.major_input)
-    }
-
     private fun initializeObservers() {
         settingsViewModel.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
@@ -129,6 +124,11 @@ class SettingsActivity : AppCompatActivity() {
             
         }
         settingsViewModel.gender.observe(this) {
+            when (it){
+                0 -> genderViewFemale.isChecked = true;
+                1 -> genderViewMale.isChecked = true;
+                2 -> genderViewOther.isChecked = true;
+            }
 
         }
         settingsViewModel.phoneNumber.observe(this) {
@@ -149,7 +149,14 @@ class SettingsActivity : AppCompatActivity() {
 //        settingsViewModel.classYear
 //        settingsViewModel.major
 
+        if (genderViewFemale.isChecked) {
+            settingsViewModel.gender.value = 0;
+        } else if (genderViewMale.isChecked) {
+            settingsViewModel.gender.value = 1;
+        } else if (genderViewOther.isChecked) {
+            settingsViewModel.gender.value = 2;
+        }
+
         settingsViewModel.save(this)
     }
-
 }

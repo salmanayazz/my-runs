@@ -85,9 +85,11 @@ class SettingsViewModel : ViewModel() {
                 inputStream.close()
             }
 
-            val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
-            if (profilePhotoFile.exists()) {
-                profilePhoto.value = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
+            if (profilePhoto.value != null) { // don't create img file if null
+                val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
+                if (profilePhotoFile.exists()) {
+                    profilePhoto.value = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

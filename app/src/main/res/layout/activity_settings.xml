@@ -128,10 +128,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.google.android.flexbox.FlexboxLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:justifyContent="space_between">
+
 
                         <RadioButton
                             android:id="@+id/radio_gender_female"
@@ -150,7 +147,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Other" />
-                    </com.google.android.flexbox.FlexboxLayout>
+
                 </RadioGroup>
 
             </LinearLayout>
