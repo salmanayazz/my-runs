@@ -62,7 +62,7 @@ class SettingsViewModel : ViewModel() {
         }
         Toast.makeText(
             context,
-            "success",
+            "Successfully saved settings",
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -75,7 +75,6 @@ class SettingsViewModel : ViewModel() {
                 val reader = BufferedReader(InputStreamReader(inputStream))
 
                 name.value = getValueFromLine(reader.readLine(), "name: ")
-                println("loaded val is ${name.value}")
                 email.value = getValueFromLine(reader.readLine(), "email: ")
                 gender.value = getIntValueFromLine(reader.readLine(), "gender: ")
                 phoneNumber.value = getValueFromLine(reader.readLine(), "phoneNumber: ")
@@ -84,14 +83,11 @@ class SettingsViewModel : ViewModel() {
 
                 reader.close()
                 inputStream.close()
-            } else {
-                println("file no exist")
             }
 
             val profilePhotoFile = File(context.getExternalFilesDir(null), profilePhotoFileName)
             if (profilePhotoFile.exists()) {
-                val profilePhotoBitmap = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
-                profilePhoto.value = profilePhotoBitmap
+                profilePhoto.value = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
             }
         } catch (e: Exception) {
             e.printStackTrace()

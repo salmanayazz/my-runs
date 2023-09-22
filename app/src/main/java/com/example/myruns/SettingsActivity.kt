@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var settingsViewModel: SettingsViewModel
 
-//    private lateinit var profilePhotoView: ImageView
+    private lateinit var profilePhotoView: ImageView
     private lateinit var nameView: EditText
 //    private lateinit var emailView: EditText
 //    private lateinit var phoneNumberView: EditText
@@ -41,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
             val data: Intent? = result.data
             if (data != null && data.extras != null) {
                 val imageBitmap = data.extras!!.get("data") as Bitmap // TODO: change to something not deprecated
-                setProfileImage(imageBitmap)
+                settingsViewModel.profilePhoto.value = imageBitmap
             }
         }
     }
@@ -110,7 +110,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initializeViews() {
-//        profilePhotoView = findViewById(R.id.profile_photo)
+        profilePhotoView = findViewById(R.id.profile_photo)
         nameView = findViewById(R.id.name_input)
 //        emailView = findViewById(R.id.email_input)
 //        phoneNumberView = findViewById(R.id.phone_input)
@@ -120,7 +120,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun initializeObservers() {
         settingsViewModel.profilePhoto.observe(this) {
-
+            profilePhotoView.setImageBitmap(it)
         }
         settingsViewModel.name.observe(this) {
             nameView.text = Editable.Factory.getInstance().newEditable(it)
@@ -143,7 +143,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun saveSettings() {
-//        settingsViewModel.profilePhoto.value
         settingsViewModel.name.value = nameView.text.toString()
 //        settingsViewModel.email
 //        settingsViewModel.phoneNumber
