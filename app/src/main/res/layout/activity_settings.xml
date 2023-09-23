@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +8,11 @@
     android:orientation="vertical"
     tools:context=".SettingsActivity">
 
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="com.example.myruns.ToolbarFragment"/>
+        android:name="com.example.myruns.ToolbarFragment" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,235 +22,171 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="28dp"
-            android:divider="@drawable/empty_tall_divider"
-            android:showDividers="middle">
+            android:padding="28dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="194dp">
 
                 <ImageView
                     android:id="@+id/profile_photo"
-                    android:layout_width="94dp"
-                    android:layout_height="93dp"
-                    android:layout_marginTop="60dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+                    android:layout_width="170dp"
+                    android:layout_height="160dp"
+                    android:layout_marginTop="32dp"
+                    android:contentDescription="your profile image"
+                    android:src="@drawable/baseline_person_24"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@color/design_default_color_error"
-                    tools:srcCompat="@tools:sample/avatars"
-                    android:contentDescription="your profile image" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                     android:id="@+id/profile_photo_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="88dp"
+                    android:layout_marginEnd="16dp"
                     android:text="Change"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toEndOf="@+id/profile_photo"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    style="@style/Button.TextButton"/>
 
                 <TextView
                     android:id="@+id/profile_photo_text"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
                     android:text="Profile Photo"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+                    android:textAppearance="@style/Header"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
+            <!-- Name -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:hint="Name"
+                app:startIconDrawable="@drawable/baseline_person_24"
+                style="@style/TextInputLayout">
 
-                <TextView
-                    android:id="@+id/name_header"
+                <EditText
+                    android:id="@+id/name_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    style="@style/EditText" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/baseline_person_24"
-                    android:hint="Name">
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/name_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/email_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:hint="Email"
+                app:startIconDrawable="@drawable/baseline_email_24"
+                style="@style/TextInputLayout">
 
-                <TextView
-                    android:id="@+id/email_header"
+                <EditText
+                    android:id="@+id/email_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Email"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    style="@style/EditText" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/email_input_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/baseline_email_24"
-                    android:hint="Email">
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/email_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/gender_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gender"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/genderToggleGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/radio_gender_female"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:checked="true"
-                        android:text="Female" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/radio_gender_male"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Male" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/radio_gender_other"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Other" />
-                </com.google.android.material.button.MaterialButtonToggleGroup>
-
-
-
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Gender -->
+            <TextView
+                android:id="@+id/gender_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="Gender"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
 
-                <TextView
-                    android:id="@+id/phone_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Phone"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/baseline_phone_24"
-                    android:hint="Phone Number">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/phone_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/genderToggleGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                app:singleSelection="true">
 
-                <TextView
-                    android:id="@+id/class_header"
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/radio_gender_female"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Class"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Female" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/radio_gender_male"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/baseline_calendar_month_24"
-                    android:hint="Class Graduation Year (eg. 2013)">
+                    android:layout_weight="1"
+                    android:text="Male" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/class_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/radio_gender_other"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Other" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Phone -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                app:startIconDrawable="@drawable/baseline_phone_24"
+                style="@style/TextInputLayout">
 
-                <TextView
-                    android:id="@+id/major_header"
+                <EditText
+                    android:id="@+id/phone_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Major"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    android:inputType="phone"
+                    style="@style/EditText" />
 
-                <com.google.android.material.textfield.TextInputLayout
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Class -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Class Graduation Year (ex: 2013)"
+                app:startIconDrawable="@drawable/baseline_calendar_month_24"
+                style="@style/TextInputLayout">
+
+                <EditText
+                    android:id="@+id/class_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/baseline_school_24"
-                    android:hint="Major">
+                    android:inputType="number"
+                    style="@style/EditText" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/major_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <!-- Major -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Major"
+                app:startIconDrawable="@drawable/baseline_school_24"
+                style="@style/TextInputLayout">
 
-            </LinearLayout>
+                <EditText
+                    android:id="@+id/major_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/EditText" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
@@ -262,24 +198,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Confirm"
-                    tools:layout_conversion_absoluteHeight="48dp"
-                    tools:layout_conversion_absoluteWidth="99dp"
-                    tools:layout_editor_absoluteX="26dp"
-                    tools:layout_editor_absoluteY="540dp" />
+                    style="@style/Button.TextButton" />
 
                 <Button
                     android:id="@+id/cancel_settings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancel"
-                    tools:layout_conversion_absoluteHeight="48dp"
-                    tools:layout_conversion_absoluteWidth="92dp"
-                    tools:layout_editor_absoluteX="294dp"
-                    tools:layout_editor_absoluteY="540dp" />
+                    style="@style/Button.TextButton" />
             </com.google.android.flexbox.FlexboxLayout>
 
         </LinearLayout>
     </ScrollView>
-
-
 </LinearLayout>
+
