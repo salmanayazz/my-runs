@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.lang.NumberFormatException
 
@@ -36,9 +37,9 @@ class SettingsActivity : AppCompatActivity() {
     private val phoneNumberView by lazy { findViewById<EditText>(R.id.phone_input) }
     private val classYearView by lazy { findViewById<EditText>(R.id.class_input) }
     private val majorView by lazy { findViewById<EditText>(R.id.major_input) }
-    private val genderViewFemale by lazy { findViewById<RadioButton>(R.id.radio_gender_female) }
-    private val genderViewMale by lazy { findViewById<RadioButton>(R.id.radio_gender_male) }
-    private val genderViewOther by lazy { findViewById<RadioButton>(R.id.radio_gender_other) }
+    private val genderViewFemale by lazy { findViewById<MaterialButton>(R.id.radio_gender_female) }
+    private val genderViewMale by lazy { findViewById<MaterialButton>(R.id.radio_gender_male) }
+    private val genderViewOther by lazy { findViewById<MaterialButton>(R.id.radio_gender_other) }
 
     private val imageCaptureLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()

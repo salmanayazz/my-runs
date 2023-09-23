@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="32dp"
+            android:padding="28dp"
             android:divider="@drawable/empty_tall_divider"
             android:showDividers="middle">
 
@@ -79,13 +79,18 @@
                     android:text="Name"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <EditText
-                    android:id="@+id/name_input"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Your Name"
-                    android:inputType="text" />
+                    app:startIconDrawable="@drawable/baseline_person_24"
+                    android:hint="Name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/name_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -101,13 +106,19 @@
                     android:text="Email"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <EditText
-                    android:id="@+id/email_input"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/email_input_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Your Email"
-                    android:inputType="text" />
+                    app:startIconDrawable="@drawable/baseline_email_24"
+                    android:hint="Email">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -123,30 +134,40 @@
                     android:text="Gender"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <RadioGroup
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/genderToggleGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    app:singleSelection="true">
 
-                    <RadioButton
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/radio_gender_female"
-                        android:layout_width="wrap_content"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
                         android:text="Female" />
 
-                    <RadioButton
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/radio_gender_male"
-                        android:layout_width="wrap_content"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Male" />
 
-                    <RadioButton
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/radio_gender_other"
-                        android:layout_width="wrap_content"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Other" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                </RadioGroup>
+
 
             </LinearLayout>
 
@@ -162,13 +183,18 @@
                     android:text="Phone"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <EditText
-                    android:id="@+id/phone_input"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Your Phone Number"
-                    android:inputType="phone" />
+                    app:startIconDrawable="@drawable/baseline_phone_24"
+                    android:hint="Phone Number">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/phone_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -184,13 +210,18 @@
                     android:text="Class"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <EditText
-                    android:id="@+id/class_input"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="eg. 2012"
-                    android:inputType="number" />
+                    app:startIconDrawable="@drawable/baseline_calendar_month_24"
+                    android:hint="Class Graduation Year (eg. 2013)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/class_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -206,13 +237,18 @@
                     android:text="Major"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-                <EditText
-                    android:id="@+id/major_input"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Your Major"
-                    android:inputType="text" />
+                    app:startIconDrawable="@drawable/baseline_school_24"
+                    android:hint="Major">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/major_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -241,6 +277,7 @@
                     tools:layout_editor_absoluteX="294dp"
                     tools:layout_editor_absoluteY="540dp" />
             </com.google.android.flexbox.FlexboxLayout>
+
         </LinearLayout>
     </ScrollView>
 
