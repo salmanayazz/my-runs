@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.salman_ayaz_myruns1
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
@@ -11,17 +11,14 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.text.Editable
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
-import java.io.File
 import java.lang.NumberFormatException
 
 
@@ -78,6 +75,13 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.confirm_settings).setOnClickListener {
             saveSettings()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // reset changed attributes that were not saved
+        settingsViewModel.load(this)
     }
 
     override fun onRequestPermissionsResult(

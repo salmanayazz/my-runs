@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.salman_ayaz_myruns1
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,7 +11,6 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
@@ -24,11 +23,8 @@ class SettingsViewModel : ViewModel() {
     val classYear = MutableLiveData<Int>()
     val major = MutableLiveData<String>()
 
-    private val authority = "com.example.myruns"
     private val profilePhotoFileName = "profile_photo.jpg"
     private val settingsFileName = "settings.txt" // holds all other info
-
-
 
     fun save(context: Context) {
         try {
