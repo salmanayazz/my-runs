@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
-class SettingsViewModel : ViewModel() {
+class ProfileViewModel : ViewModel() {
     val profilePhoto = MutableLiveData<Bitmap>()
     val name = MutableLiveData<String>()
     val email = MutableLiveData<String>()

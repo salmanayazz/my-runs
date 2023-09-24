@@ -22,11 +22,11 @@ import com.google.android.material.button.MaterialButton
 import java.lang.NumberFormatException
 
 
-class SettingsActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity() {
     private val cameraRequestCode: Int = 1
     private val storageRequestCode: Int = 2
 
-    private lateinit var settingsViewModel: SettingsViewModel
+    private lateinit var profileViewMode: ProfileViewModel
 
     private val profilePhotoView by lazy { findViewById<ImageView>(R.id.profile_photo) }
     private val nameView by lazy { findViewById<EditText>(R.id.name_input) }
@@ -45,17 +45,17 @@ class SettingsActivity : AppCompatActivity() {
             val data: Intent? = result.data
             if (data != null && data.extras != null) {
                 val imageBitmap = data.extras!!.get("data") as Bitmap // TODO: change to something not deprecated
-                settingsViewModel.profilePhoto.value = imageBitmap
+                profileViewMode.profilePhoto.value = imageBitmap
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        setContentView(R.layout.activity_profile)
 
-        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
-        settingsViewModel.load(this)
+        profileViewMode = ViewModelProvider(this)[ProfileViewModel::class.java]
+        profileViewMode.load(this)
 
         initializeObservers()
 
@@ -81,7 +81,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onDestroy()
 
         // reset changed attributes that were not saved
-        settingsViewModel.load(this)
+        profileViewMode.load(this)
     }
 
     override fun onRequestPermissionsResult(
@@ -115,39 +115,39 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initializeObservers() {
-        settingsViewModel.profilePhoto.observe(this) {
+        profileViewMode.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
         }
-        settingsViewModel.name.observe(this) {
+        profileViewMode.name.observe(this) {
             nameView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        settingsViewModel.email.observe(this) {
+        profileViewMode.email.observe(this) {
             emailView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        settingsViewModel.gender.observe(this) {
+        profileViewMode.gender.observe(this) {
             when (it){
                 0 -> genderViewFemale.isChecked = true;
                 1 -> genderViewMale.isChecked = true;
                 2 -> genderViewOther.isChecked = true;
             }
         }
-        settingsViewModel.phoneNumber.observe(this) {
+        profileViewMode.phoneNumber.observe(this) {
             phoneNumberView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        settingsViewModel.classYear.observe(this) {
+        profileViewMode.classYear.observe(this) {
             classYearView.text = Editable.Factory.getInstance().newEditable(it.toString())
         }
-        settingsViewModel.major.observe(this) {
+        profileViewMode.major.observe(this) {
             majorView.text = Editable.Factory.getInstance().newEditable(it)
         }
     }
 
     private fun saveSettings() {
-        settingsViewModel.name.value = nameView.text.toString()
-        settingsViewModel.email.value = emailView.text.toString()
-        settingsViewModel.phoneNumber.value = phoneNumberView.text.toString()
+        profileViewMode.name.value = nameView.text.toString()
+        profileViewMode.email.value = emailView.text.toString()
+        profileViewMode.phoneNumber.value = phoneNumberView.text.toString()
         try {
-            settingsViewModel.classYear.value = (classYearView.text.toString()).toInt()
+            profileViewMode.classYear.value = (classYearView.text.toString()).toInt()
         } catch (e: NumberFormatException) {
             e.printStackTrace()
             Toast.makeText(
@@ -157,16 +157,16 @@ class SettingsActivity : AppCompatActivity() {
             ).show()
         }
 
-        settingsViewModel.major.value = majorView.text.toString()
+        profileViewMode.major.value = majorView.text.toString()
 
         if (genderViewFemale.isChecked) {
-            settingsViewModel.gender.value = 0;
+            profileViewMode.gender.value = 0;
         } else if (genderViewMale.isChecked) {
-            settingsViewModel.gender.value = 1;
+            profileViewMode.gender.value = 1;
         } else if (genderViewOther.isChecked) {
-            settingsViewModel.gender.value = 2;
+            profileViewMode.gender.value = 2;
         }
 
-        settingsViewModel.save(this)
+        profileViewMode.save(this)
     }
 }

@@ -9,7 +9,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main);
 
-        val settings = Intent(this, SettingsActivity::class.java);
+        val settings = Intent(this, ProfileActivity::class.java);
         startActivity(settings);
     }
 }
