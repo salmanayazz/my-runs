@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -19,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
 import java.io.File
@@ -44,16 +46,15 @@ class ProfileActivity : AppCompatActivity() {
     private val genderViewOther by lazy { findViewById<MaterialButton>(R.id.radio_gender_other) }
 
     private val profilePhotoFileName = "profile_photo.jpg"
+    private val tempProfilePhotoFileName = "profile_photo_temp.jpg"
+    private lateinit var tempProfilePhotoUri : Uri
 
     private val imageCaptureLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) { // successfully captured photo
-            val data: Intent? = result.data
-            if (data != null && data.extras != null) {
-                val imageBitmap = data.extras!!.get("data") as Bitmap // TODO: change to something not deprecated
-                profileViewModel.profilePhoto.value = imageBitmap
-            }
+        if (result.resultCode == Activity.RESULT_OK) {
+            val imageBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(tempProfilePhotoUri))
+            profileViewModel.profilePhoto.value = imageBitmap
         }
     }
 
@@ -93,12 +94,25 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun launchCamera() {
+        val imgFile = File(getExternalFilesDir(null), tempProfilePhotoFileName)
+        tempProfilePhotoUri = FileProvider.getUriForFile(
+            this,
+            "com.example.salman_ayaz_myruns1",
+            imgFile
+        )
+
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempProfilePhotoUri) // where to store the temp photo data
 
         try {
             imageCaptureLauncher.launch(intent)
         } catch (e: Exception) {
-            e.printStackTrace();
+            e.printStackTrace()
+            Toast.makeText(
+                this,
+                "Failed to launch camera: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -156,14 +170,11 @@ class ProfileActivity : AppCompatActivity() {
 
 
             // save image to file
-            if (profileViewModel.profilePhoto.value != null) { // don't create img file if null
-                val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
+            val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
+            if (profileViewModel.profilePhoto.value != null) {
+                val imageBitmap = profileViewModel.profilePhoto.value
                 val profilePhotoOutputStream = FileOutputStream(profilePhotoFile)
-                profileViewModel.profilePhoto.value?.compress(
-                    Bitmap.CompressFormat.JPEG,
-                    100,
-                    profilePhotoOutputStream
-                )
+                imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, profilePhotoOutputStream)
                 profilePhotoOutputStream.close()
             }
         } catch (e: Exception)  {
@@ -203,9 +214,8 @@ class ProfileActivity : AppCompatActivity() {
             // load image from file
             val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
             if (profilePhotoFile.exists()) {
-                profileViewModel.profilePhoto.value = BitmapFactory.decodeFile(
-                    profilePhotoFile.absolutePath
-                )
+                val imageBitmap = BitmapFactory.decodeFile(profilePhotoFile.absolutePath)
+                profileViewModel.profilePhoto.value = imageBitmap
             }
         } catch (e: Exception) {
             e.printStackTrace()
