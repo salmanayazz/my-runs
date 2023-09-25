@@ -1,32 +1,31 @@
 package com.example.salman_ayaz_myruns1
 
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.Button
-import androidx.core.app.ActivityCompat
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
-import java.lang.NumberFormatException
 
 
 class ProfileActivity : AppCompatActivity() {
     private val cameraRequestCode: Int = 1
     private val storageRequestCode: Int = 2
 
-    private lateinit var profileViewMode: ProfileViewModel
+    private lateinit var profileViewModel: ProfileViewModel
 
     private val profilePhotoView by lazy { findViewById<ImageView>(R.id.profile_photo) }
     private val nameView by lazy { findViewById<EditText>(R.id.name_input) }
@@ -45,7 +44,7 @@ class ProfileActivity : AppCompatActivity() {
             val data: Intent? = result.data
             if (data != null && data.extras != null) {
                 val imageBitmap = data.extras!!.get("data") as Bitmap // TODO: change to something not deprecated
-                profileViewMode.profilePhoto.value = imageBitmap
+                profileViewModel.profilePhoto.value = imageBitmap
             }
         }
     }
@@ -54,34 +53,13 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        profileViewMode = ViewModelProvider(this)[ProfileViewModel::class.java]
-        profileViewMode.load(this)
-
-        initializeObservers()
-
-
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), storageRequestCode)
 
-        findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
+        profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+        loadProfile()
 
-            // show popup to ask for camera permissions, if successful, launch camera
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                cameraRequestCode
-            )
-        }
-
-        findViewById<Button>(R.id.confirm_settings).setOnClickListener {
-            saveSettings()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // reset changed attributes that were not saved
-        profileViewMode.load(this)
+        initializeObservers()
+        initializeListeners()
     }
 
     override fun onRequestPermissionsResult(
@@ -114,59 +92,80 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun initializeListeners() {
+        // button listeners
+        findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
+            // show popup to ask for camera permissions, if successful, launch camera
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                cameraRequestCode
+            )
+        }
+        findViewById<Button>(R.id.confirm_settings).setOnClickListener {
+            saveProfile()
+            finish()
+        }
+        findViewById<Button>(R.id.cancel_settings).setOnClickListener {
+            finish()
+        }
+    }
+
     private fun initializeObservers() {
-        profileViewMode.profilePhoto.observe(this) {
+        profileViewModel.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
         }
-        profileViewMode.name.observe(this) {
+        profileViewModel.name.observe(this) {
             nameView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        profileViewMode.email.observe(this) {
+        profileViewModel.email.observe(this) {
             emailView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        profileViewMode.gender.observe(this) {
+        profileViewModel.gender.observe(this) {
             when (it){
                 0 -> genderViewFemale.isChecked = true;
                 1 -> genderViewMale.isChecked = true;
                 2 -> genderViewOther.isChecked = true;
             }
         }
-        profileViewMode.phoneNumber.observe(this) {
+        profileViewModel.phoneNumber.observe(this) {
             phoneNumberView.text = Editable.Factory.getInstance().newEditable(it)
         }
-        profileViewMode.classYear.observe(this) {
-            classYearView.text = Editable.Factory.getInstance().newEditable(it.toString())
+        profileViewModel.classYear.observe(this) {
+            classYearView.text = Editable.Factory.getInstance().newEditable(it?.toString() ?: "")
         }
-        profileViewMode.major.observe(this) {
+        profileViewModel.major.observe(this) {
             majorView.text = Editable.Factory.getInstance().newEditable(it)
         }
     }
 
-    private fun saveSettings() {
-        profileViewMode.name.value = nameView.text.toString()
-        profileViewMode.email.value = emailView.text.toString()
-        profileViewMode.phoneNumber.value = phoneNumberView.text.toString()
+    private fun saveProfile() {
+        profileViewModel.name.value = nameView.text.toString()
+        profileViewModel.email.value = emailView.text.toString()
+        profileViewModel.phoneNumber.value = phoneNumberView.text.toString()
         try {
-            profileViewMode.classYear.value = (classYearView.text.toString()).toInt()
+            profileViewModel.classYear.value = (classYearView.text.toString()).toInt()
         } catch (e: NumberFormatException) {
+            profileViewModel.classYear.value = null;
             e.printStackTrace()
-            Toast.makeText(
-                this,
-                "Class year number is too large", // TODO
-                Toast.LENGTH_SHORT
-            ).show()
         }
 
-        profileViewMode.major.value = majorView.text.toString()
+        profileViewModel.major.value = majorView.text.toString()
 
         if (genderViewFemale.isChecked) {
-            profileViewMode.gender.value = 0;
+            profileViewModel.gender.value = 0
         } else if (genderViewMale.isChecked) {
-            profileViewMode.gender.value = 1;
+            profileViewModel.gender.value = 1
         } else if (genderViewOther.isChecked) {
-            profileViewMode.gender.value = 2;
+            profileViewModel.gender.value = 2
+        } else {
+            profileViewModel.gender.value = null
         }
 
-        profileViewMode.save(this)
+        profileViewModel.save(this)
+    }
+
+    private fun loadProfile() {
+        profileViewModel.load(this)
     }
 }
