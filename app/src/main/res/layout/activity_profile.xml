@@ -63,10 +63,17 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name"
+                android:hint="Your Name"
                 app:startIconDrawable="@drawable/baseline_person_24"
                 style="@style/TextInputLayout">
 
@@ -79,11 +86,18 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/email_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="Your Email"
                 app:startIconDrawable="@drawable/baseline_email_24"
                 style="@style/TextInputLayout">
 
@@ -97,52 +111,45 @@
 
             <!-- Gender -->
             <TextView
-                android:id="@+id/gender_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Gender"
                 android:textAppearance="@style/Header"
                 android:paddingTop="16dp"/>
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/genderToggleGroup"
+            <RadioGroup
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:singleSelection="true">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButton
+                <RadioButton
                     android:id="@+id/radio_gender_female"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:checked="true"
                     android:text="Female" />
 
-                <com.google.android.material.button.MaterialButton
+                <RadioButton
                     android:id="@+id/radio_gender_male"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="Male" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/radio_gender_other"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Other" />
+            </RadioGroup>
 
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+
 
             <!-- Phone -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Phone"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone Number"
+                android:hint="Your Phone Number"
                 app:startIconDrawable="@drawable/baseline_phone_24"
                 style="@style/TextInputLayout">
 
@@ -156,10 +163,17 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Class -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Class"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Class Graduation Year (ex: 2013)"
+                android:hint="eg. 2012"
                 app:startIconDrawable="@drawable/baseline_calendar_month_24"
                 style="@style/TextInputLayout">
 
@@ -173,10 +187,17 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Major -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Major"
+                android:textAppearance="@style/Header"
+                android:paddingTop="16dp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Major"
+                android:hint="Your Major"
                 app:startIconDrawable="@drawable/baseline_school_24"
                 style="@style/TextInputLayout">
 

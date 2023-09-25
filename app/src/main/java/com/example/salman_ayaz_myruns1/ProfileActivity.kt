@@ -14,6 +14,7 @@ import android.text.Editable
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -41,9 +42,8 @@ class ProfileActivity : AppCompatActivity() {
     private val phoneNumberView by lazy { findViewById<EditText>(R.id.phone_input) }
     private val classYearView by lazy { findViewById<EditText>(R.id.class_input) }
     private val majorView by lazy { findViewById<EditText>(R.id.major_input) }
-    private val genderViewFemale by lazy { findViewById<MaterialButton>(R.id.radio_gender_female) }
-    private val genderViewMale by lazy { findViewById<MaterialButton>(R.id.radio_gender_male) }
-    private val genderViewOther by lazy { findViewById<MaterialButton>(R.id.radio_gender_other) }
+    private val genderViewFemale by lazy { findViewById<RadioButton>(R.id.radio_gender_female) }
+    private val genderViewMale by lazy { findViewById<RadioButton>(R.id.radio_gender_male) }
 
     private val profilePhotoFileName = "profile_photo.jpg"
     private val tempProfilePhotoFileName = "profile_photo_temp.jpg"
@@ -161,7 +161,6 @@ class ProfileActivity : AppCompatActivity() {
             val gender = when {
                 genderViewFemale.isChecked -> 0
                 genderViewMale.isChecked -> 1
-                genderViewOther.isChecked -> 2
                 else -> -1 // none selected
             }
             editor.putInt("gender", gender)
@@ -209,7 +208,6 @@ class ProfileActivity : AppCompatActivity() {
             when (profileSharedPrefs.getInt("gender", -1)) {
                 0 -> genderViewFemale.isChecked = true
                 1 -> genderViewMale.isChecked = true
-                2 -> genderViewOther.isChecked = true
             }
             // load image from file
             val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
