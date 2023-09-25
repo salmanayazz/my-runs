@@ -3,8 +3,10 @@ package com.example.salman_ayaz_myruns1
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -19,6 +21,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
+import java.io.File
+import java.io.FileOutputStream
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -26,6 +30,8 @@ class ProfileActivity : AppCompatActivity() {
     private val storageRequestCode: Int = 2
 
     private lateinit var profileViewModel: ProfileViewModel
+
+    private lateinit var profileSharedPrefs: SharedPreferences
 
     private val profilePhotoView by lazy { findViewById<ImageView>(R.id.profile_photo) }
     private val nameView by lazy { findViewById<EditText>(R.id.name_input) }
@@ -36,6 +42,8 @@ class ProfileActivity : AppCompatActivity() {
     private val genderViewFemale by lazy { findViewById<MaterialButton>(R.id.radio_gender_female) }
     private val genderViewMale by lazy { findViewById<MaterialButton>(R.id.radio_gender_male) }
     private val genderViewOther by lazy { findViewById<MaterialButton>(R.id.radio_gender_other) }
+
+    private val profilePhotoFileName = "profile_photo.jpg"
 
     private val imageCaptureLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -56,6 +64,8 @@ class ProfileActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), storageRequestCode)
 
         profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+        profileSharedPrefs = getSharedPreferences("profile", MODE_PRIVATE)
+
         loadProfile()
 
         initializeObservers()
@@ -115,57 +125,95 @@ class ProfileActivity : AppCompatActivity() {
         profileViewModel.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
         }
-        profileViewModel.name.observe(this) {
-            nameView.text = Editable.Factory.getInstance().newEditable(it)
-        }
-        profileViewModel.email.observe(this) {
-            emailView.text = Editable.Factory.getInstance().newEditable(it)
-        }
-        profileViewModel.gender.observe(this) {
-            when (it){
-                0 -> genderViewFemale.isChecked = true;
-                1 -> genderViewMale.isChecked = true;
-                2 -> genderViewOther.isChecked = true;
-            }
-        }
-        profileViewModel.phoneNumber.observe(this) {
-            phoneNumberView.text = Editable.Factory.getInstance().newEditable(it)
-        }
-        profileViewModel.classYear.observe(this) {
-            classYearView.text = Editable.Factory.getInstance().newEditable(it?.toString() ?: "")
-        }
-        profileViewModel.major.observe(this) {
-            majorView.text = Editable.Factory.getInstance().newEditable(it)
-        }
     }
 
     private fun saveProfile() {
-        profileViewModel.name.value = nameView.text.toString()
-        profileViewModel.email.value = emailView.text.toString()
-        profileViewModel.phoneNumber.value = phoneNumberView.text.toString()
         try {
-            profileViewModel.classYear.value = (classYearView.text.toString()).toInt()
-        } catch (e: NumberFormatException) {
-            profileViewModel.classYear.value = null;
+            val editor = profileSharedPrefs.edit()
+            editor.putString("name", nameView.text.toString())
+            editor.putString("email", emailView.text.toString())
+            editor.putString("phoneNumber", phoneNumberView.text.toString())
+
+            editor.putString("major", majorView.text.toString())
+
+            // remove classYear entry if the input is null
+            // allows to empty the input field instead of having a default val
+            if (classYearView.text.toString() == "") {
+                editor.remove("classYear")
+            } else {
+                editor.putInt("classYear", classYearView.text.toString().toInt())
+            }
+
+            val gender = when {
+                genderViewFemale.isChecked -> 0
+                genderViewMale.isChecked -> 1
+                genderViewOther.isChecked -> 2
+                else -> -1 // none selected
+            }
+            editor.putInt("gender", gender)
+
+            editor.apply()
+
+
+            // save image to file
+            if (profileViewModel.profilePhoto.value != null) { // don't create img file if null
+                val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
+                val profilePhotoOutputStream = FileOutputStream(profilePhotoFile)
+                profileViewModel.profilePhoto.value?.compress(
+                    Bitmap.CompressFormat.JPEG,
+                    100,
+                    profilePhotoOutputStream
+                )
+                profilePhotoOutputStream.close()
+            }
+        } catch (e: Exception)  {
             e.printStackTrace()
+            e.printStackTrace()
+            Toast.makeText(
+                this,
+                "There was an error saving settings",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-
-        profileViewModel.major.value = majorView.text.toString()
-
-        if (genderViewFemale.isChecked) {
-            profileViewModel.gender.value = 0
-        } else if (genderViewMale.isChecked) {
-            profileViewModel.gender.value = 1
-        } else if (genderViewOther.isChecked) {
-            profileViewModel.gender.value = 2
-        } else {
-            profileViewModel.gender.value = null
-        }
-
-        profileViewModel.save(this)
+        Toast.makeText(
+            this,
+            "Successfully saved settings",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun loadProfile() {
-        profileViewModel.load(this)
+        try {
+            // retrieve input values from shared pref
+            nameView.setText(profileSharedPrefs.getString("name", ""))
+            emailView.setText(profileSharedPrefs.getString("email", ""))
+            phoneNumberView.setText(profileSharedPrefs.getString("phoneNumber", ""))
+            // check if classYear exists to set the text to null if not present
+            if (profileSharedPrefs.contains("classYear")) {
+                classYearView.setText(profileSharedPrefs.getInt("classYear", 0).toString())
+            } else {
+                classYearView.text = null
+            }
+            majorView.setText(profileSharedPrefs.getString("major", ""))
+            when (profileSharedPrefs.getInt("gender", -1)) {
+                0 -> genderViewFemale.isChecked = true
+                1 -> genderViewMale.isChecked = true
+                2 -> genderViewOther.isChecked = true
+            }
+            // load image from file
+            val profilePhotoFile = File(getExternalFilesDir(null), profilePhotoFileName)
+            if (profilePhotoFile.exists()) {
+                profileViewModel.profilePhoto.value = BitmapFactory.decodeFile(
+                    profilePhotoFile.absolutePath
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(
+                this,
+                "There was an error loading settings",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }
