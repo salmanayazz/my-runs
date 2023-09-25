@@ -1,16 +1,18 @@
 package com.example.salman_ayaz_myruns1
 
 import android.Manifest
+import android.R.attr.height
+import android.R.attr.width
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.Editable
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -23,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.io.FileOutputStream
 
@@ -54,7 +55,11 @@ class ProfileActivity : AppCompatActivity() {
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val imageBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(tempProfilePhotoUri))
-            profileViewModel.profilePhoto.value = imageBitmap
+            // rotate the bitmap
+            val matrix = Matrix()
+            matrix.setRotate(90f)
+            var rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height, matrix, true)
+            profileViewModel.profilePhoto.value = rotatedBitmap
         }
     }
 
@@ -116,6 +121,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    // setup button listeners
     private fun initializeListeners() {
         // button listeners
         findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
@@ -135,12 +141,14 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    // observers for ViewModel
     private fun initializeObservers() {
         profileViewModel.profilePhoto.observe(this) {
             profilePhotoView.setImageBitmap(it)
         }
     }
 
+    // saves the profile to file
     private fun saveProfile() {
         try {
             val editor = profileSharedPrefs.edit()
@@ -192,6 +200,8 @@ class ProfileActivity : AppCompatActivity() {
         ).show()
     }
 
+
+    // loads the profile from file
     private fun loadProfile() {
         try {
             // retrieve input values from shared pref
