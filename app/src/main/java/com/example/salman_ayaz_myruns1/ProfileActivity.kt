@@ -54,12 +54,10 @@ class ProfileActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(tempProfilePhotoUri))
-            // rotate the bitmap
-            val matrix = Matrix()
-            matrix.setRotate(90f)
-            var rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height, matrix, true)
-            profileViewModel.profilePhoto.value = rotatedBitmap
+            // put temp image in the view model
+            profileViewModel.profilePhoto.value = BitmapFactory.decodeStream(
+                contentResolver.openInputStream(tempProfilePhotoUri)
+            )
         }
     }
 
