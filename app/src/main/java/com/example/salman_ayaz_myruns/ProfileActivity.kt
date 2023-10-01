@@ -1,4 +1,4 @@
-package com.example.salman_ayaz_myruns1
+package com.example.salman_ayaz_myruns
 
 import android.Manifest
 import android.R.attr.height
@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.NumberFormatException
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -100,7 +101,7 @@ class ProfileActivity : AppCompatActivity() {
         val imgFile = File(getExternalFilesDir(null), tempProfilePhotoFileName)
         tempProfilePhotoUri = FileProvider.getUriForFile(
             this,
-            "com.example.salman_ayaz_myruns1",
+            "com.example.salman_ayaz_myruns",
             imgFile
         )
 
@@ -131,8 +132,9 @@ class ProfileActivity : AppCompatActivity() {
             )
         }
         findViewById<Button>(R.id.confirm_settings).setOnClickListener {
-            saveProfile()
-            finish()
+            if (saveProfile()) {
+                finish()
+            }
         }
         findViewById<Button>(R.id.cancel_settings).setOnClickListener {
             finish()
@@ -147,7 +149,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     // saves the profile to file
-    private fun saveProfile() {
+    private fun saveProfile(): Boolean {
         try {
             val editor = profileSharedPrefs.edit()
             editor.putString("name", nameView.text.toString())
@@ -161,7 +163,18 @@ class ProfileActivity : AppCompatActivity() {
             if (classYearView.text.toString() == "") {
                 editor.remove("classYear")
             } else {
-                editor.putInt("classYear", classYearView.text.toString().toInt())
+                try {
+                    editor.putInt("classYear", classYearView.text.toString().toInt())
+                } catch(e: NumberFormatException) {
+                    e.printStackTrace()
+                    Toast.makeText(
+                        this,
+                        "Invalid class year",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return false
+                }
+
             }
 
             val gender = when {
@@ -170,8 +183,6 @@ class ProfileActivity : AppCompatActivity() {
                 else -> -1 // none selected
             }
             editor.putInt("gender", gender)
-
-            editor.apply()
 
 
             // save image to file
@@ -182,6 +193,8 @@ class ProfileActivity : AppCompatActivity() {
                 imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, profilePhotoOutputStream)
                 profilePhotoOutputStream.close()
             }
+
+            editor.apply()
         } catch (e: Exception)  {
             e.printStackTrace()
             e.printStackTrace()
@@ -190,12 +203,14 @@ class ProfileActivity : AppCompatActivity() {
                 "There was an error saving settings",
                 Toast.LENGTH_SHORT
             ).show()
+            return false;
         }
         Toast.makeText(
             this,
             "Successfully saved settings",
             Toast.LENGTH_SHORT
         ).show()
+        return true;
     }
 
 
