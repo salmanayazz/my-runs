@@ -1,17 +1,23 @@
 package com.example.salman_ayaz_myruns
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.TimePicker
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.textfield.TextInputLayout
+import java.util.Calendar
 
-class ManualInputActivity : AppCompatActivity() {
+class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private val dateSelector by lazy { findViewById<EditText>(R.id.date_selector) }
     private val timeSelector by lazy { findViewById<EditText>(R.id.time_selector) }
     private val durationSelector by lazy { findViewById<EditText>(R.id.duration_selector) }
@@ -19,6 +25,8 @@ class ManualInputActivity : AppCompatActivity() {
     private val caloriesSelector by lazy { findViewById<EditText>(R.id.calories_selector) }
     private val heatRateSelector by lazy { findViewById<EditText>(R.id.heart_rate_selector) }
     private val commentsSelector by lazy { findViewById<EditText>(R.id.comments_selector) }
+
+    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,26 +36,85 @@ class ManualInputActivity : AppCompatActivity() {
 
     private fun initializeListeners() {
         dateSelector.setOnClickListener() {
-
+            DatePickerDialog(
+                this,
+                this,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
         timeSelector.setOnClickListener() {
-
+            TimePickerDialog(
+                this,
+                this,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
         }
         durationSelector.setOnClickListener() {
-
+            showInputDialog("", "Duration", InputType.TYPE_CLASS_NUMBER)
         }
         distanceSelector.setOnClickListener() {
-
+            showInputDialog("", "Distance", InputType.TYPE_CLASS_NUMBER)
         }
         caloriesSelector.setOnClickListener() {
-
+            showInputDialog("", "Calories", InputType.TYPE_CLASS_NUMBER)
         }
         heatRateSelector.setOnClickListener() {
-
+            showInputDialog("", "Calories", InputType.TYPE_CLASS_NUMBER)
         }
         commentsSelector.setOnClickListener() {
+            showInputDialog("", "Duration", InputType.TYPE_CLASS_TEXT)
+        }
 
+        // confirm and cancel buttons
+        findViewById<Button>(R.id.button_confirm).setOnClickListener {
+            finish()
+        }
+        findViewById<Button>(R.id.button_cancel).setOnClickListener {
+            finish()
         }
     }
 
+    private fun showInputDialog(title: String, hint: String, inputType: Int) {
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setTitle(title)
+
+        val editText = EditText(this)
+        editText.hint = hint
+        editText.inputType = inputType
+
+//        val layoutParams = LinearLayout.LayoutParams(
+//            LinearLayout.LayoutParams.MATCH_PARENT,
+//            LinearLayout.LayoutParams.WRAP_CONTENT
+//        )
+//        val marginInDp = resources.getDimension(R.dimen.edit_text_margin).toInt()
+//        layoutParams.setMargins(marginInDp, marginInDp, marginInDp, marginInDp)
+        //editText.layoutParams = layoutParams
+
+        alertDialogBuilder.setView(editText)
+
+        alertDialogBuilder.setPositiveButton("OK") { dialog: DialogInterface, which: Int ->
+            val userInput = editText.text.toString()
+
+            dialog.dismiss()
+        }
+
+        alertDialogBuilder.setNegativeButton("Cancel") { dialog: DialogInterface, which: Int ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
+    override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
+
+    }
+
+    override fun onTimeSet(view: TimePicker, hour: Int, minute: Int) {
+
+    }
 }
