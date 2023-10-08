@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+        android:title="Account Preferences" >
+
+        <PreferenceScreen
+            android:key="user_profile"
+            android:title="Name, Email, Class, etc"
+            android:summary="User Profile">
+
+            <intent
+                android:action="com.example.salman_ayaz_myruns.VIEW_USER_PROFILE"
+                android:targetPackage="com.example.salman_ayaz_myruns"
+                android:targetClass="com.example.salman_ayaz_myruns.ProfileActivity"/>
+
+        </PreferenceScreen>
+
+        <CheckBoxPreference
+            android:key="privacy_setting"
+            android:title="Privacy Setting"
+            android:summary="Post your records anonymously"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Additional Settings" >
+
+        <ListPreference
+            android:key="unit_preference"
+            android:title="Unit Preference"
+            android:summary="Select your preferred unit"
+            android:entries="@array/list_entries"
+            android:entryValues="@array/list_values"
+            android:defaultValue="metric"/>
+
+        <EditTextPreference
+            android:key="comments"
+            android:title="Comments"
+            android:summary="Please enter your comments"
+            android:defaultValue=""
+            android:inputType="text" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Misc." >
+
+        <PreferenceScreen
+            android:key="class_homepage"
+            android:title="Class Homepage"
+            android:summary="Visit our class webpage">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://www.sfu.ca/computing.html"/>
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+</PreferenceScreen>
