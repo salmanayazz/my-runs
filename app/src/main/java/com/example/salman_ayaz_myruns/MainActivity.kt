@@ -5,13 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
     private val tabFragments = ArrayList<Fragment>()
-    private val startRunsFragment = StartRunsFragment()
+    private val startFragment = StartFragment()
     private val historyFragment = HistoryFragment()
     private val settingsFragment = SettingsFragment()
 
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main);
 
-        tabFragments.add(startRunsFragment)
+        tabFragments.add(startFragment)
         tabFragments.add(historyFragment)
         tabFragments.add(settingsFragment)
 

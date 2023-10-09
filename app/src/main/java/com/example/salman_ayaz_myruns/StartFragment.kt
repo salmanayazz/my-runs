@@ -1,6 +1,5 @@
 package com.example.salman_ayaz_myruns
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -11,15 +10,13 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
-import android.widget.Spinner
-import com.google.android.material.textfield.TextInputLayout
 
 /**
  * A simple [Fragment] subclass.
- * Use the [StartRunsFragment.newInstance] factory method to
+ * Use the [StartFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class StartRunsFragment : Fragment() {
+class StartFragment : Fragment() {
     private val inputTypeList = listOf("Manual Entry", "GPS", "Automatic")
     private val activityTypeList = listOf(
         "Running", "Walking", "Standing", "Cycling",
@@ -41,7 +38,7 @@ class StartRunsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val rootView = inflater.inflate(R.layout.fragment_start_runs, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_start, container, false)
 
         inputType = rootView.findViewById(R.id.actv_input_type)
         activityType = rootView.findViewById(R.id.actv_activity_type)
