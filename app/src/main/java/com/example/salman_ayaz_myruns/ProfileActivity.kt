@@ -1,38 +1,37 @@
 package com.example.salman_ayaz_myruns
 
 import android.Manifest
-import android.R.attr.height
-import android.R.attr.width
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.NumberFormatException
 
 
 class ProfileActivity : AppCompatActivity() {
-    private val cameraRequestCode: Int = 1
-    private val storageRequestCode: Int = 2
+    private val cameraRequestCode = 1
+    private val storageRequestCode = 2
+    private val selectImageRequestCode = 3
 
     private lateinit var profileViewModel: ProfileViewModel
 
@@ -61,6 +60,19 @@ class ProfileActivity : AppCompatActivity() {
             )
         }
     }
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+
+                // if successful, set image in ViewModel and save image URI
+                val tempProfilePhotoUri = result.data!!.data
+                profileViewModel.profilePhoto.value = BitmapFactory.decodeStream(
+                    tempProfilePhotoUri?.let { contentResolver.openInputStream(it) }
+                )
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,23 +132,61 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    // setup button listeners
-    private fun initializeListeners() {
-        // button listeners
-        findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
+    private fun showImagePickerDialog() {
+        var dialog: AlertDialog? = null
+
+        // create a DialogAlert
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("Choose Image Source")
+
+        // LinearLayout to hold the buttons
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+
+        // button for selecting an image from a file
+        val selectFromFileButton = Button(this)
+        selectFromFileButton.text = "Select from Gallery"
+        selectFromFileButton.setOnClickListener {
+            // open gallery app
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            pickImageLauncher.launch(intent)
+            dialog?.dismiss()
+        }
+        layout.addView(selectFromFileButton)
+
+        // button for taking a photo with the camera
+        val takePhotoButton = Button(this)
+        takePhotoButton.text = "Open Camera"
+        takePhotoButton.setOnClickListener {
             // show popup to ask for camera permissions, if successful, launch camera
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
                 cameraRequestCode
             )
+            dialog?.dismiss()
         }
-        findViewById<Button>(R.id.confirm_settings).setOnClickListener {
+        layout.addView(takePhotoButton)
+        dialogBuilder.setView(layout)
+
+        //  show the dialog
+        dialog = dialogBuilder.create()
+        dialog?.show()
+    }
+
+    // setup button listeners
+    private fun initializeListeners() {
+        // button listeners
+        findViewById<Button>(R.id.profile_photo_button).setOnClickListener {
+            showImagePickerDialog()
+        }
+        findViewById<Button>(R.id.confirm_profile).setOnClickListener {
             if (saveProfile()) {
                 finish()
             }
         }
-        findViewById<Button>(R.id.cancel_settings).setOnClickListener {
+        findViewById<Button>(R.id.cancel_profile).setOnClickListener {
             finish()
         }
     }
@@ -200,14 +250,14 @@ class ProfileActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(
                 this,
-                "There was an error saving settings",
+                "There was an error saving your profile",
                 Toast.LENGTH_SHORT
             ).show()
             return false;
         }
         Toast.makeText(
             this,
-            "Successfully saved settings",
+            "Successfully saved your profile",
             Toast.LENGTH_SHORT
         ).show()
         return true;
@@ -242,7 +292,7 @@ class ProfileActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(
                 this,
-                "There was an error loading settings",
+                "There was an error loading profile",
                 Toast.LENGTH_SHORT
             ).show()
         }
