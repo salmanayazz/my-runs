@@ -87,6 +87,7 @@ class ProfileActivity : AppCompatActivity() {
 
         initializeObservers()
         initializeListeners()
+        populateToolbarFragment()
     }
 
     override fun onRequestPermissionsResult(
@@ -111,11 +112,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun launchCamera() {
         val imgFile = File(getExternalFilesDir(null), tempProfilePhotoFileName)
-        tempProfilePhotoUri = FileProvider.getUriForFile(
-            this,
-            "com.example.salman_ayaz_myruns",
-            imgFile
-        )
+        val packageName = applicationContext.packageName
+        tempProfilePhotoUri = FileProvider.getUriForFile(this, packageName, imgFile)
 
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempProfilePhotoUri) // where to store the temp photo data
@@ -296,5 +294,11 @@ class ProfileActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun populateToolbarFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.toolbar_fragment, ToolbarFragment())
+        transaction.commit()
     }
 }

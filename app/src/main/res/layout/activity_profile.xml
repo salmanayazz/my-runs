@@ -9,10 +9,9 @@
     tools:context=".ProfileActivity">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
+        android:id="@+id/toolbar_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="com.example.salman_ayaz_myruns.ToolbarFragment" />
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
