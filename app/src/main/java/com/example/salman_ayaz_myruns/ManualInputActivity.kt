@@ -50,23 +50,53 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
                 this,
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
-                true
+                false
             ).show()
         }
         durationSelector.setOnClickListener() {
-            showInputDialog("", "Duration", InputType.TYPE_CLASS_NUMBER)
+            val fragment = InputDialogFragment.newInstance(
+                "",
+                "Duration",
+                InputType.TYPE_CLASS_NUMBER
+            )
+
+            fragment.show(supportFragmentManager, "input_dialog")
         }
         distanceSelector.setOnClickListener() {
-            showInputDialog("", "Distance", InputType.TYPE_CLASS_NUMBER)
+            val fragment = InputDialogFragment.newInstance(
+                "",
+                "Distance",
+                InputType.TYPE_CLASS_NUMBER
+            )
+
+            fragment.show(supportFragmentManager, "input_dialog")
         }
         caloriesSelector.setOnClickListener() {
-            showInputDialog("", "Calories", InputType.TYPE_CLASS_NUMBER)
+            val fragment = InputDialogFragment.newInstance(
+                "",
+                "Calories",
+                InputType.TYPE_CLASS_NUMBER
+            )
+
+            fragment.show(supportFragmentManager, "input_dialog")
         }
         heatRateSelector.setOnClickListener() {
-            showInputDialog("", "Calories", InputType.TYPE_CLASS_NUMBER)
+            val fragment = InputDialogFragment.newInstance(
+                "",
+                "Heart Rate",
+                InputType.TYPE_CLASS_NUMBER
+            )
+
+            fragment.show(supportFragmentManager, "input_dialog")
         }
         commentsSelector.setOnClickListener() {
-            showInputDialog("", "Duration", InputType.TYPE_CLASS_TEXT)
+            val fragment = InputDialogFragment.newInstance(
+                "",
+                "Comments",
+                InputType.TYPE_CLASS_TEXT
+            )
+
+            fragment.show(supportFragmentManager, "input_dialog")
         }
 
         // confirm and cancel buttons
