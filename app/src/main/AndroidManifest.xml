@@ -19,6 +19,9 @@
         android:theme="@style/Theme.MyRuns"
         tools:targetApi="31">
         <activity
+            android:name=".MapDisplayActivity"
+            android:exported="false" />
+        <activity
             android:name=".ManualInputActivity"
             android:exported="false" />
         <activity
