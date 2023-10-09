@@ -8,14 +8,7 @@
         <PreferenceScreen
             android:key="user_profile"
             android:title="Name, Email, Class, etc"
-            android:summary="User Profile">
-
-            <intent
-                android:action="com.example.salman_ayaz_myruns.VIEW_USER_PROFILE"
-                android:targetPackage="com.example.myruns"
-                android:targetClass="com.example.myruns.ProfileActivity"/>
-
-        </PreferenceScreen>
+            android:summary="User Profile" />
 
         <CheckBoxPreference
             android:key="privacy_setting"
