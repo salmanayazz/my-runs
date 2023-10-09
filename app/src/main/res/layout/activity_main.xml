@@ -8,6 +8,13 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="@string/app_name"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
@@ -16,27 +23,6 @@
         app:tabInlineLabel="true"
         app:tabMaxWidth="0dp"
         app:tabMode="fixed">
-
-        <!--<com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:icon="@drawable/baseline_directions_run_24"
-            android:text="Start" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:icon="@drawable/baseline_history_24"
-            android:text="History" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:icon="@drawable/baseline_settings_24"
-            android:text="Settings" />-->
 
     </com.google.android.material.tabs.TabLayout>
 
