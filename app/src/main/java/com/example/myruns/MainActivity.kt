@@ -1,4 +1,4 @@
-package com.example.salman_ayaz_myruns
+package com.example.myruns
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

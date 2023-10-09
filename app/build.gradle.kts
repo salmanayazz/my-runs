@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.salman_ayaz_myruns"
+    namespace = "com.example.myruns"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.salman_ayaz_myruns"
+        applicationId = "com.example.myruns"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -39,7 +39,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.google.android.material:material:1.9.0")

@@ -12,8 +12,8 @@
 
             <intent
                 android:action="com.example.salman_ayaz_myruns.VIEW_USER_PROFILE"
-                android:targetPackage="com.example.salman_ayaz_myruns"
-                android:targetClass="com.example.salman_ayaz_myruns.ProfileActivity"/>
+                android:targetPackage="com.example.myruns"
+                android:targetClass="com.example.myruns.ProfileActivity"/>
 
         </PreferenceScreen>
 
