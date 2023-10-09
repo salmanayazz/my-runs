@@ -88,6 +88,10 @@ class ProfileActivity : AppCompatActivity() {
         initializeObservers()
         initializeListeners()
         populateToolbarFragment()
+
+        if (profileViewModel.isDialogShowing) {
+            showImagePickerDialog()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -131,6 +135,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showImagePickerDialog() {
+
         var dialog: AlertDialog? = null
 
         // create a DialogAlert
@@ -149,6 +154,7 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             pickImageLauncher.launch(intent)
+            profileViewModel.isDialogShowing = false
             dialog?.dismiss()
         }
         layout.addView(selectFromFileButton)
@@ -163,6 +169,7 @@ class ProfileActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.CAMERA),
                 cameraRequestCode
             )
+            profileViewModel.isDialogShowing = false
             dialog?.dismiss()
         }
         layout.addView(takePhotoButton)
@@ -171,6 +178,7 @@ class ProfileActivity : AppCompatActivity() {
         //  show the dialog
         dialog = dialogBuilder.create()
         dialog?.show()
+        profileViewModel.isDialogShowing = true
     }
 
     // setup button listeners

@@ -6,4 +6,5 @@ import androidx.lifecycle.ViewModel
 
 class ProfileViewModel : ViewModel() {
     val profilePhoto = MutableLiveData<Bitmap>()
+    var isDialogShowing: Boolean = false
 }
