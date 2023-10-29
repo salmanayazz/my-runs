@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui.profile
 
 import android.Manifest
 import android.app.Activity
@@ -24,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
+import com.example.myruns.R
+import com.example.myruns.ui.ToolbarFragment
 import java.io.File
 import java.io.FileOutputStream
 

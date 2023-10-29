@@ -1,8 +1,9 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.example.myruns.R
 
 class MapDisplayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

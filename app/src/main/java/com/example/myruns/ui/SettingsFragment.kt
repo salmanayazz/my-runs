@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.example.myruns.R
+import com.example.myruns.ui.profile.ProfileActivity
 
 /**
  * A simple [Fragment] subclass.

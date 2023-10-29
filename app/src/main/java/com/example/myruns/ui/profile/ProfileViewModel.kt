@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui.profile
 
 import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData

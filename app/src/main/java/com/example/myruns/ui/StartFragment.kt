@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import com.example.myruns.R
 
 /**
  * A simple [Fragment] subclass.

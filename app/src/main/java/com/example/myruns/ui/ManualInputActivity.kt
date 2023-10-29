@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TimePicker
 import androidx.appcompat.app.AlertDialog
+import com.example.myruns.R
 import com.google.android.material.textfield.TextInputLayout
 import java.util.Calendar
 

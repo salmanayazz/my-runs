@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

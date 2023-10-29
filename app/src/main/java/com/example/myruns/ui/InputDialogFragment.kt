@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.example.myruns.R
 import com.google.android.material.textfield.TextInputLayout
 
 /**
