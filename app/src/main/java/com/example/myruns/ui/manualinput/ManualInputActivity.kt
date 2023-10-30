@@ -16,7 +16,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
-
+import com.example.myruns.data.exercise.ExerciseDatabase
+import com.example.myruns.data.exercise.ExerciseRepository
+import com.example.myruns.ui.ExerciseViewModelFactory
 import com.example.myruns.ui.InputDialogFragment
 import com.example.myruns.ui.InputDialogListener
 import java.util.Calendar
@@ -38,11 +40,19 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input)
 
-
-        manualInputViewModel = ViewModelProvider(this,)[ManualInputViewModel::class.java]
+        // setup mvvm objects
+        var database = ExerciseDatabase.getInstance(this)
+        var databaseDao = database.exerciseDatabaseDao
+        var repository = ExerciseRepository(databaseDao)
+        var viewModelFactory = ExerciseViewModelFactory(repository)
+        manualInputViewModel = ViewModelProvider(
+            this,
+            viewModelFactory
+        )[ManualInputViewModel::class.java]
 
         initializeListeners()
         initializeObservers()
+        manualInputViewModel.getAll()
     }
 
     private fun initializeListeners() {
@@ -103,6 +113,7 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
 
         // confirm and cancel buttons
         findViewById<Button>(R.id.button_confirm).setOnClickListener {
+            manualInputViewModel.insert()
             finish()
         }
         findViewById<Button>(R.id.button_cancel).setOnClickListener {
@@ -111,12 +122,17 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     }
 
     private fun initializeObservers() {
-        manualInputViewModel.date.observe(this) {
-            dateSelector.setText(it.toString())
+        manualInputViewModel.dateTime.observe(this) {
+            println("setting time: 2")
+            println("setting time: 2 ${manualInputViewModel.pickedTime}")
+            if (manualInputViewModel.pickedDate) {
+                dateSelector.setText("${it[Calendar.DAY_OF_MONTH]} / ${it[Calendar.MONTH]} / ${it[Calendar.YEAR]}")
+            } else if (manualInputViewModel.pickedTime) {
+                println("setting time: 3")
+                timeSelector.setText("${it[Calendar.HOUR_OF_DAY]} : ${it[Calendar.MINUTE]}")
+            }
         }
-        manualInputViewModel.time.observe(this) {
-            timeSelector.setText(it.toString())
-        }
+
         manualInputViewModel.duration.observe(this) {
             durationSelector.setText(it.toString())
         }
@@ -152,11 +168,31 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-        manualInputViewModel.date.value = "$day/$month/$year"
+        if (!manualInputViewModel.pickedDate) {
+            manualInputViewModel.pickedDate = true
+        }
+
+        manualInputViewModel.dateTime.value?.set(Calendar.YEAR, year)
+        manualInputViewModel.dateTime.value?.set(Calendar.MONTH, month)
+        manualInputViewModel.dateTime.value?.set(Calendar.DAY_OF_MONTH, day)
+
+        // force a notify
+        manualInputViewModel.dateTime.value = manualInputViewModel.dateTime.value
     }
 
     override fun onTimeSet(view: TimePicker, hour: Int, minute: Int) {
-        manualInputViewModel.time.value = "$hour:$minute"
+        println("setting time")
+        if (!manualInputViewModel.pickedTime) {
+            manualInputViewModel.pickedTime = true
+        }
+
+        println("setting time: ${manualInputViewModel.pickedTime}")
+
+        manualInputViewModel.dateTime.value?.set(Calendar.HOUR_OF_DAY, hour)
+        manualInputViewModel.dateTime.value?.set(Calendar.MINUTE, minute)
+
+        // force a notify
+        manualInputViewModel.dateTime.value = manualInputViewModel.dateTime.value
     }
 
     override fun onDataPassed(data: String) {
@@ -167,9 +203,9 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
                 ManualInputViewModel.DialogOptions.DISTANCE ->
                     manualInputViewModel.distance.value = data.toInt()
                 ManualInputViewModel.DialogOptions.CALORIES ->
-                    manualInputViewModel.calories.value = data.toInt()
+                    manualInputViewModel.calories.value = data.toDouble()
                 ManualInputViewModel.DialogOptions.HEART_RATE ->
-                    manualInputViewModel.heartRate.value = data.toInt()
+                    manualInputViewModel.heartRate.value = data.toDouble()
                 ManualInputViewModel.DialogOptions.COMMENTS ->
                     manualInputViewModel.comments.value = data
                 else -> {}
