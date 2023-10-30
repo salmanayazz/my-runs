@@ -22,7 +22,7 @@
             android:name=".ui.MapDisplayActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ManualInputActivity"
+            android:name=".ui.manualinput.ManualInputActivity"
             android:exported="false" />
         <activity
             android:name=".ui.profile.ProfileActivity"

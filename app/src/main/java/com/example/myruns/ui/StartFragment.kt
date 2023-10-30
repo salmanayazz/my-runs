@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import com.example.myruns.R
+import com.example.myruns.ui.manualinput.ManualInputActivity
 
 /**
  * A simple [Fragment] subclass.
