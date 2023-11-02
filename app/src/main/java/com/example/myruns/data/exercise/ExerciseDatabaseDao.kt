@@ -10,7 +10,7 @@ interface ExerciseDatabaseDao {
     @Insert
     suspend fun insertExercise(exerciseEntry: ExerciseEntry)
 
-    @Query("SELECT * FROM exercise_table")
+    @Query("SELECT * FROM exercise_table ORDER BY dateTime DESC")
     fun getAllExercises(): Flow<List<ExerciseEntry>>
 
     @Query("DELETE FROM exercise_table WHERE id = :key")
