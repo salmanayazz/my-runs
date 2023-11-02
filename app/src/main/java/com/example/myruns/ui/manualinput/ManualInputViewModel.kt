@@ -1,5 +1,7 @@
 package com.example.myruns.ui.manualinput
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myruns.data.exercise.ExerciseEntry
@@ -48,13 +50,11 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
     }
 
     fun getAll() {
-        println("all comments:")
+
         CoroutineScope(IO).launch{
             repository.allComments.collect() {
-                println(it)
+                println("entry: ${it}")
             }
         }
-
-
     }
 }
