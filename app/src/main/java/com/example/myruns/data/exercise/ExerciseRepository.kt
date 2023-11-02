@@ -20,4 +20,10 @@ class ExerciseRepository(private val commentDatabaseDao: ExerciseDatabaseDao) {
             commentDatabaseDao.deleteExercise(id)
         }
     }
+
+    fun deleteAll() {
+        CoroutineScope(IO).launch {
+            commentDatabaseDao.deleteAll()
+        }
+    }
 }

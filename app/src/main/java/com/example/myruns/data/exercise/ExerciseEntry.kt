@@ -3,6 +3,7 @@ package com.example.myruns.data.exercise;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import java.io.Serializable
 import java.util.Calendar
 
 @Entity(tableName = "exercise_table")
@@ -21,5 +22,5 @@ data class ExerciseEntry(
     val heartRate: Double?,
     val comment: String?,
     //val locationList: ArrayList<LatLng>
-)
+): Serializable
 
