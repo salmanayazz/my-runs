@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
@@ -61,14 +62,21 @@ class HistoryEntryActivity : AppCompatActivity() {
     }
 
     private fun populateText() {
-        if (exerciseEntry != null) {
-//            findViewById<EditText>(R.id.date)
-//                .setText(SimpleDateFormat("yyyy-MM-dd")
-//                    .format(exerciseEntry!!.dateTime))
-//
-//            findViewById<EditText>(R.id.time)
-//                .setText(SimpleDateFormat("HH:mm")
-//                    .format(exerciseEntry!!.dateTime))
+        if (exerciseEntry != null && exerciseEntry!!.dateTime != null) {
+            try {
+                val date = exerciseEntry!!.dateTime?.time
+                findViewById<EditText>(R.id.date)
+                    .setText(SimpleDateFormat("yyyy-MM-dd").format(date))
+                findViewById<EditText>(R.id.time)
+                    .setText(SimpleDateFormat("HH:mm").format(date))
+            } catch (e: IllegalArgumentException) {
+                println(e.printStackTrace())
+                Toast.makeText(
+                    this,
+                    "Date Format error",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
             findViewById<EditText>(R.id.duration)
                 .setText(exerciseEntry!!.duration?.toString() ?: "")
@@ -84,8 +92,10 @@ class HistoryEntryActivity : AppCompatActivity() {
 
             findViewById<EditText>(R.id.comments)
                 .setText(exerciseEntry!!.comment ?: "")
-
         }
 
+
+
     }
+
 }
