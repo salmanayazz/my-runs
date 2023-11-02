@@ -2,9 +2,16 @@ package com.example.myruns.ui.history
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
+import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseEntry
+import com.example.myruns.data.exercise.ExerciseRepository
+import com.example.myruns.ui.ExerciseViewModelFactory
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.text.SimpleDateFormat
@@ -12,7 +19,7 @@ import java.text.SimpleDateFormat
 class HistoryEntryActivity : AppCompatActivity() {
     private var exerciseEntry: ExerciseEntry? = null
     companion object {
-        val EXERCISE_ENTRY = "exercise_entry"
+        const val EXERCISE_ENTRY = "exercise_entry"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,15 +29,33 @@ class HistoryEntryActivity : AppCompatActivity() {
         // get the ExerciseEntry as a byte array
         val exerciseByteArr = intent.getByteArrayExtra(EXERCISE_ENTRY)
 
+        // setup mvvm objects
+        var database = ExerciseDatabase.getInstance(this)
+        var databaseDao = database.exerciseDatabaseDao
+        var repository = ExerciseRepository(databaseDao)
+        var viewModelFactory = ExerciseViewModelFactory(repository)
+        var historyViewModel = ViewModelProvider(
+            this,
+            viewModelFactory
+        )[HistoryViewModel::class.java]
+
         try {
             // parse into ExerciseEntry if not null
             exerciseEntry = ObjectInputStream(
                 ByteArrayInputStream(exerciseByteArr)
             ).readObject() as ExerciseEntry
-            println("git the entry: $exerciseEntry")
+
             populateText()
         } catch (e: Exception) {
             println(e.printStackTrace())
+        }
+
+        // delete entry onClick
+        findViewById<ImageView>(R.id.delete_entry).setOnClickListener() {
+            exerciseEntry?.id?.let {
+                    it1 -> historyViewModel.delete(it1)
+            }
+            this.finish()
         }
 
     }

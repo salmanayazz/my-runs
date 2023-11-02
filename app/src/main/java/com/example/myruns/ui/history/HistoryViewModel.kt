@@ -6,4 +6,8 @@ import com.example.myruns.data.exercise.ExerciseRepository
 
 class HistoryViewModel(private val repository: ExerciseRepository) : ViewModel() {
     val exerciseEntries = repository.allComments.asLiveData()
+
+    fun delete(id: Long) {
+        repository.delete(id)
+    }
 }

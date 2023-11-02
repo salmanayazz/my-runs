@@ -20,7 +20,19 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+            style="@style/Widget.MaterialComponents.Toolbar.Primary">
+
+            <ImageView
+                android:id="@+id/delete_entry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_delete_24"
+                android:contentDescription="Delete"
+                android:paddingEnd="16dp"
+                android:layout_gravity="end"
+                app:showAsAction="ifRoom" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
