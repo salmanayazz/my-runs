@@ -24,8 +24,6 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
     var dialogOpen = MutableLiveData<DialogOptions>(null)
 
     var dateTime = MutableLiveData(Calendar.getInstance())
-    var pickedDate = false
-    var pickedTime = false
 
     var duration = MutableLiveData<Int>()
     var distance = MutableLiveData<Int>()

@@ -21,6 +21,7 @@ import com.example.myruns.data.exercise.ExerciseRepository
 import com.example.myruns.ui.ExerciseViewModelFactory
 import com.example.myruns.ui.InputDialogFragment
 import com.example.myruns.ui.InputDialogListener
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, InputDialogListener {
@@ -123,14 +124,8 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
 
     private fun initializeObservers() {
         manualInputViewModel.dateTime.observe(this) {
-            println("setting time: 2")
-            println("setting time: 2 ${manualInputViewModel.pickedTime}")
-            if (manualInputViewModel.pickedDate) {
-                dateSelector.setText("${it[Calendar.DAY_OF_MONTH]} / ${it[Calendar.MONTH]} / ${it[Calendar.YEAR]}")
-            } else if (manualInputViewModel.pickedTime) {
-                println("setting time: 3")
-                timeSelector.setText("${it[Calendar.HOUR_OF_DAY]} : ${it[Calendar.MINUTE]}")
-            }
+            dateSelector.setText(SimpleDateFormat("yyyy-MM-dd").format(it.time))
+            timeSelector.setText(SimpleDateFormat("HH:mm").format(it.time))
         }
 
         manualInputViewModel.duration.observe(this) {
@@ -168,10 +163,6 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-        if (!manualInputViewModel.pickedDate) {
-            manualInputViewModel.pickedDate = true
-        }
-
         manualInputViewModel.dateTime.value?.set(Calendar.YEAR, year)
         manualInputViewModel.dateTime.value?.set(Calendar.MONTH, month)
         manualInputViewModel.dateTime.value?.set(Calendar.DAY_OF_MONTH, day)
@@ -181,13 +172,6 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     }
 
     override fun onTimeSet(view: TimePicker, hour: Int, minute: Int) {
-        println("setting time")
-        if (!manualInputViewModel.pickedTime) {
-            manualInputViewModel.pickedTime = true
-        }
-
-        println("setting time: ${manualInputViewModel.pickedTime}")
-
         manualInputViewModel.dateTime.value?.set(Calendar.HOUR_OF_DAY, hour)
         manualInputViewModel.dateTime.value?.set(Calendar.MINUTE, minute)
 
