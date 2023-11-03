@@ -75,7 +75,8 @@
             android:layout_height="wrap_content"
             android:hint="Duration"
             app:startIconDrawable="@drawable/baseline_timelapse_24"
-            style="@style/TextInputLayout">
+            style="@style/TextInputLayout"
+            app:suffixText="secs">
 
             <EditText
                 android:id="@+id/duration"
@@ -89,11 +90,13 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/distance_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Distance"
             app:startIconDrawable="@drawable/straighten_24"
-            style="@style/TextInputLayout">
+            style="@style/TextInputLayout"
+            app:suffixText="test">
 
             <EditText
                 android:id="@+id/distance"
@@ -111,7 +114,8 @@
             android:layout_height="wrap_content"
             android:hint="Calories"
             app:startIconDrawable="@drawable/baseline_local_fire_department_24"
-            style="@style/TextInputLayout">
+            style="@style/TextInputLayout"
+            app:suffixText="cals">
 
             <EditText
                 android:id="@+id/calories"
@@ -129,7 +133,8 @@
             android:layout_height="wrap_content"
             android:hint="Heart Rate"
             app:startIconDrawable="@drawable/baseline_monitor_heart_24"
-            style="@style/TextInputLayout">
+            style="@style/TextInputLayout"
+            app:suffixText="bpm">
 
             <EditText
                 android:id="@+id/heart_rate"

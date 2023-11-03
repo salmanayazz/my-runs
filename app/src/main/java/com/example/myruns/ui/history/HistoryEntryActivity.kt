@@ -2,23 +2,34 @@ package com.example.myruns.ui.history
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
 import com.example.myruns.ui.ExerciseViewModelFactory
+import com.example.myruns.ui.SettingsFragment
+import com.google.android.material.textfield.TextInputLayout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.text.SimpleDateFormat
 
+/**
+ * activity that displays a single ExerciseEntry and allows the user to delete it
+ */
 class HistoryEntryActivity : AppCompatActivity() {
     private var exerciseEntry: ExerciseEntry? = null
+    private lateinit var historyViewModel: HistoryViewModel
+    private val distanceTextInputLayout by lazy { findViewById<TextInputLayout>(R.id.distance_text_input) }
+    private val sharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     companion object {
         const val EXERCISE_ENTRY = "exercise_entry"
     }
@@ -35,7 +46,7 @@ class HistoryEntryActivity : AppCompatActivity() {
         var databaseDao = database.exerciseDatabaseDao
         var repository = ExerciseRepository(databaseDao)
         var viewModelFactory = ExerciseViewModelFactory(repository)
-        var historyViewModel = ViewModelProvider(
+        historyViewModel = ViewModelProvider(
             this,
             viewModelFactory
         )[HistoryViewModel::class.java]
@@ -59,8 +70,12 @@ class HistoryEntryActivity : AppCompatActivity() {
             this.finish()
         }
 
+        setupObservers()
     }
 
+    /**
+     * populates the EditTexts with the ExerciseEntry's data
+     */
     private fun populateText() {
         if (exerciseEntry != null && exerciseEntry!!.dateTime != null) {
             try {
@@ -93,9 +108,34 @@ class HistoryEntryActivity : AppCompatActivity() {
             findViewById<EditText>(R.id.comments)
                 .setText(exerciseEntry!!.comment ?: "")
         }
-
-
-
     }
 
+    /**
+     * updates the units every time the fragment is loaded
+     */
+    override fun onResume() {
+        super.onResume()
+
+        // update the units every time fragment is loaded
+        val unit = sharedPreferences
+            .getString(
+                SettingsFragment.UNIT_PREFERENCE,
+                SettingsFragment.UNIT_METRIC
+            )
+        historyViewModel.unitPreference.value = unit
+        Log.d("HistoryFragment", "UNIT_PREFERENCE changed to $unit")
+    }
+
+    /**
+     * sets up the observers for the unit preference
+     */
+    private fun setupObservers() {
+        historyViewModel.unitPreference.observe(this) {
+            if (historyViewModel.unitPreference.value == SettingsFragment.UNIT_METRIC) {
+                distanceTextInputLayout.suffixText = "kilometers"
+            } else {
+                distanceTextInputLayout.suffixText = "miles"
+            }
+        }
+    }
 }

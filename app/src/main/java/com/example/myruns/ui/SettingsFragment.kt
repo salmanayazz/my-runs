@@ -1,32 +1,42 @@
 package com.example.myruns.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.myruns.R
 import com.example.myruns.ui.profile.ProfileActivity
 
 /**
- * A simple [Fragment] subclass.
- * Use the [SettingsFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * fragment that displays the settings screen and handles the user's settings
+ * @see R.xml.settings_preference
  */
 class SettingsFragment : PreferenceFragmentCompat() {
+    private lateinit var sharedPreferences: SharedPreferences
+    companion object {
+        const val SETTINGS_PREF_KEY = "settings_pref_key" // key for the settings shared preferences
+        const val UNIT_PREFERENCE = "unit_preference"
+        const val UNIT_METRIC = "metric"
+        const val UNIT_IMPERIAL = "imperial"
+        const val PROFILE_PREFERENCE = "user_profile"
+    }
+
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preference, rootKey)
+        setPreferencesFromResource(R.xml.settings_preference, rootKey)
+        sharedPreferences = requireContext().getSharedPreferences(SETTINGS_PREF_KEY, Context.MODE_PRIVATE)
 
         // click listener that opens ProfileActivity
-        val userProfilePreference = findPreference<Preference>("user_profile")
+        val userProfilePreference = findPreference<Preference>(PROFILE_PREFERENCE)
         userProfilePreference?.setOnPreferenceClickListener {
             val intent = Intent(requireContext(), ProfileActivity::class.java)
             startActivity(intent)
             true
         }
+
     }
 }

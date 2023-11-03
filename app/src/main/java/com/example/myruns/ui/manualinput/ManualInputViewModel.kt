@@ -9,7 +9,16 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
+/**
+ * view model for the ManualInputFragment
+ * @param repository
+ * the repository for the ExerciseEntry database
+ */
 class ManualInputViewModel(private val repository: ExerciseRepository): ViewModel() {
+    /**
+     * the options for the dialog that pops up when the user 
+     * clicks on a field in the ManualInputFragment
+     */
     enum class DialogOptions {
         DURATION,
         DISTANCE,
@@ -27,28 +36,27 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
     var heartRate = MutableLiveData<Double>()
     var comments = MutableLiveData<String>()
 
+    val unitPreference = MutableLiveData<String>()
+
+    /**
+     * inserts an exercise entry into the database
+     */
     fun insert() {
-        repository.insert(ExerciseEntry(
-            0,
-            "Manual Input",
-            0, // TODO: CHANGE THIS VALUE
-            dateTime.value,
-            duration.value,
-            distance.value,
-            0,
-            calories.value,
-            0.0,
-            heartRate.value,
-            comments.value
-        ))
-    }
-
-    fun getAll() {
-
-        CoroutineScope(IO).launch{
-            repository.allComments.collect() {
-                println("entry: ${it}")
-            }
+        unitPreference.value?.let {
+            repository.insert(ExerciseEntry(
+                0,
+                "Manual Input",
+                0, // TODO: CHANGE THIS VALUE
+                dateTime.value,
+                duration.value,
+                distance.value,
+                0,
+                calories.value,
+                0.0,
+                heartRate.value,
+                comments.value
+            ), it
+            )
         }
     }
 }
