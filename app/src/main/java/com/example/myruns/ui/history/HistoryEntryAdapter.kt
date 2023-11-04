@@ -46,11 +46,13 @@ class ExerciseEntryAdapter(
         val duration: TextView by lazy { view.findViewById<TextView>(R.id.duration) }
 
         fun bind(exerciseEntry: ExerciseEntry) {
+            // populate TextViews with ExerciseEntry data
             inputType.text = exerciseEntry.inputType
             activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
             duration.text = (exerciseEntry.duration?.toString() ?: "0") + " mins"
 
+            // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->
                 if (unitPref == SettingsFragment.UNIT_METRIC) {
                     distance.text = (exerciseEntry.distance?.toString() ?: "0") + " kilometers"

@@ -6,6 +6,32 @@ import androidx.room.PrimaryKey;
 import java.io.Serializable
 import java.util.Calendar
 
+/**
+ * represents an exercise entry
+ * @param id
+ * the id of the exercise
+ * @param inputType
+ * the input type of the exercise
+ * @param activityType
+ * the activity type of the exercise
+ * @param dateTime
+ * the date and time of the exercise
+ * @param duration
+ * the duration in mins
+ * @param distance
+ * the distance in kilometers 
+ * (the db stores the distance in kilometers and converts if needed)
+ * @param avgPace
+ * TODO
+ * @param calories
+ * the amount of calories burned
+ * @param climb
+ * TODO
+ * @param heartRate
+ * heart rate in bpm
+ * @param comment
+ * any comments the user wrote about the exercise
+ */
 @Entity(tableName = "exercise_table")
 data class ExerciseEntry(
     @PrimaryKey(autoGenerate = true)

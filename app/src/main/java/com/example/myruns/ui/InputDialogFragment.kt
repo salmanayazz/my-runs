@@ -16,11 +16,16 @@ import androidx.fragment.app.DialogFragment
 import com.example.myruns.R
 import com.google.android.material.textfield.TextInputLayout
 
-
+/**
+ * interface for passing data from the dialog to the activity/fragment
+ */
 interface InputDialogListener {
     fun onDataPassed(data: String)
 }
 
+/**
+ * a pop-up dialog that prompts the user for input
+ */
 class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     private var inputDialogListener: InputDialogListener? = null
     private lateinit var editText: EditText
@@ -53,18 +58,21 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // obtain the arguments that were passed to the fragment
         val inflater = LayoutInflater.from(requireContext())
         val view = inflater.inflate(R.layout.fragment_input_dialog, null)
         val title = arguments?.getString(ARG_TITLE) ?: ""
         val hint = arguments?.getString(ARG_HINT) ?: ""
         val inputType = arguments?.getInt(ARG_INPUT_TYPE) ?: InputType.TYPE_CLASS_TEXT
-
+        
+        // set up the dialog
         val textInputLayout: TextInputLayout = view.findViewById(R.id.text_input_layout)
         textInputLayout.hint = hint
 
         editText = view.findViewById(R.id.edit_text)
         editText.inputType = inputType
 
+        // build the dialog
         return AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setView(view)
@@ -73,13 +81,11 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             .create()
     }
 
-    override fun onClick(dialog: DialogInterface?, which: Int) {
+    override fun onClick(dialog: DialogInterface?, which: Int) {    
         if (which == DialogInterface.BUTTON_POSITIVE) {
+            // send data to the activity/fragment
             val text = editText?.text.toString()
-            Toast.makeText(activity, "Ok clicked. Text: $text", Toast.LENGTH_LONG).show()
             inputDialogListener?.onDataPassed(text)
-        } else if (which == DialogInterface.BUTTON_NEGATIVE) {
-            Toast.makeText(activity, "Cancel clicked", Toast.LENGTH_LONG).show()
         }
     }
 }

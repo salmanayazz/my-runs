@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+/**
+ * repository for the ExerciseEntry database
+ * @param exerciseDatabaseDao
+ * the dao for the ExerciseEntry database
+ */
 class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
     private val kmToMilesConversion = 0.621371
 
