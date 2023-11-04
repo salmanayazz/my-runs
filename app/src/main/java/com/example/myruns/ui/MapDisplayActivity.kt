@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import com.example.myruns.R
 
+/**
+ * activity for displaying a map
+ * TODO: implement this activity
+ */
 class MapDisplayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

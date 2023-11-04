@@ -29,7 +29,10 @@ import com.example.myruns.ui.ToolbarFragment
 import java.io.File
 import java.io.FileOutputStream
 
-
+/**
+ * Activity for the profile page
+ * which allows the user to edit their profile
+ */
 class ProfileActivity : AppCompatActivity() {
     private val cameraRequestCode = 1
     private val storageRequestCode = 2

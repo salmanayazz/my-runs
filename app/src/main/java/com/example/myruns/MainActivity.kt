@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.example.myruns.ui.HistoryFragment
-import com.example.myruns.ui.MyFragmentStateAdapter
+import com.example.myruns.ui.history.HistoryFragment
+import com.example.myruns.ui.TabFragmentStateAdapter
 import com.example.myruns.ui.SettingsFragment
 import com.example.myruns.ui.StartFragment
 import com.google.android.material.tabs.TabLayout
@@ -22,18 +22,19 @@ class MainActivity : AppCompatActivity() {
     private val viewPager by lazy { findViewById<ViewPager2>(R.id.view_pager) }
     private lateinit var tabLayoutMediator: TabLayoutMediator
     private lateinit var tabConfigurationStrategy: TabLayoutMediator.TabConfigurationStrategy
-    private lateinit var myFragmentStateAdapter: MyFragmentStateAdapter
+    private lateinit var tabFragmentStateAdapter: TabFragmentStateAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main);
 
+        // set up tab layout
         tabFragments.add(startFragment)
         tabFragments.add(historyFragment)
         tabFragments.add(settingsFragment)
 
-        myFragmentStateAdapter = MyFragmentStateAdapter(this, tabFragments)
-        viewPager.adapter = myFragmentStateAdapter
+        tabFragmentStateAdapter = TabFragmentStateAdapter(this, tabFragments)
+        viewPager.adapter = tabFragmentStateAdapter
 
         tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         tabLayoutMediator.attach()
-
     }
 
     override fun onDestroy() {
