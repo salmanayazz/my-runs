@@ -1,5 +1,6 @@
 package com.example.myruns.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -19,13 +20,18 @@ import com.example.myruns.ui.manualinput.ManualInputActivity
  * create an instance of this fragment.
  */
 class StartFragment : Fragment() {
-    private val inputTypeList = listOf("Manual Entry", "GPS", "Automatic")
-    private val activityTypeList = listOf(
-        "Running", "Walking", "Standing", "Cycling",
-        "Hiking", "Downhill Skiing", "Cross-Country Skiing",
-        "Snowboarding", "Skating", "Swimming", "Mountain Biking",
-        "Wheelchair", "Elliptical", "Other"
-    )
+    companion object {
+        val inputTypeList = listOf("Manual Entry", "GPS", "Automatic")
+        val activityTypeList = listOf(
+            "Running", "Walking", "Standing", "Cycling",
+            "Hiking", "Downhill Skiing", "Cross-Country Skiing",
+            "Snowboarding", "Skating", "Swimming", "Mountain Biking",
+            "Wheelchair", "Elliptical", "Other"
+        )
+
+        val INPUT_TYPE_MANUAL = inputTypeList[0]
+    }
+
 
     private lateinit var inputType: AutoCompleteTextView
     private lateinit var activityType: AutoCompleteTextView
@@ -42,6 +48,8 @@ class StartFragment : Fragment() {
         // Inflate the layout for this fragment
         val rootView = inflater.inflate(R.layout.fragment_start, container, false)
 
+
+        // setup AutoCompleteTextViews
         inputType = rootView.findViewById(R.id.actv_input_type)
         activityType = rootView.findViewById(R.id.actv_activity_type)
 
@@ -57,29 +65,43 @@ class StartFragment : Fragment() {
             activityTypeList
         )
 
-        var selectedInput = inputTypeList[0]
-        inputType.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-            selectedInput = parent.getItemAtPosition(position).toString()
+        // listeners for AutoCompleteTextViews
+        var selectedInput = 0
+        inputType.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            selectedInput = position
         }
 
+        var selectedActivity = 0
+        activityType.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            println("activity type: position ${position}")
+            selectedActivity = position
+        }
+
+        // submit and start ManualInputActivity or MapDisplayActivity
         startButton = rootView.findViewById(R.id.button_start)
         startButton.setOnClickListener() {
             // start activity based on user selection
-            val settings = Intent(
-                requireActivity(),
-                if (selectedInput == "Manual Entry") {
-                    ManualInputActivity::class.java
-                } else {
-                    MapDisplayActivity::class.java
-                }
-            )
-            startActivity(settings)
+            val intent = if (inputTypeList[selectedInput] == INPUT_TYPE_MANUAL) {
+                Intent(requireContext(), ManualInputActivity::class.java)
+                    .putExtra(ManualInputActivity.ACTIVITY_TYPE_KEY, selectedActivity)
+            } else {
+                Intent(requireContext(), MapDisplayActivity::class.java)
+            }
+            startActivity(intent)
         }
 
         return rootView
     }
 
-    // sets up the AutoCompleteTextView with the given actvID
+    /**
+     * sets up the AutoCompleteTextView with the given actvID
+     * @param rootView
+     * the root view of the fragment
+     * @param actvID
+     * the id of the AutoCompleteTextView
+     * @param menuOptions
+     * the list of options to display in the AutoCompleteTextView
+     */
     private fun setupACTV(rootView: View, actvID: Int, menuOptions: List<String>) {
         val autoCompleteTextView = rootView.findViewById<AutoCompleteTextView>(actvID)
 

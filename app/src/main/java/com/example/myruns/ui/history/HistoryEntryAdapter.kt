@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.ui.SettingsFragment
+import com.example.myruns.ui.StartFragment
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -46,7 +47,7 @@ class ExerciseEntryAdapter(
 
         fun bind(exerciseEntry: ExerciseEntry) {
             inputType.text = exerciseEntry.inputType
-            activityType.text = exerciseEntry.activityType.toString()
+            activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
             duration.text = (exerciseEntry.duration?.toString() ?: "0") + " secs"
 

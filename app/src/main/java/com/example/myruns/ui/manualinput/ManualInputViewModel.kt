@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
+import com.example.myruns.ui.StartFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
         HEART_RATE,
         COMMENTS
     }
+    /** to reopen dialog on orientation change */
     var dialogOpen = MutableLiveData<DialogOptions>(null)
 
     var dateTime = MutableLiveData(Calendar.getInstance())
@@ -38,6 +40,9 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
 
     val unitPreference = MutableLiveData<String>()
 
+    /** activity type index for StartFragment.activityTypeList */
+    var activityType: Int = 0
+
     /**
      * inserts an exercise entry into the database
      */
@@ -45,8 +50,8 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
         unitPreference.value?.let {
             repository.insert(ExerciseEntry(
                 0,
-                "Manual Input",
-                0, // TODO: CHANGE THIS VALUE
+                StartFragment.INPUT_TYPE_MANUAL,
+                activityType,
                 dateTime.value,
                 duration.value,
                 distance.value,

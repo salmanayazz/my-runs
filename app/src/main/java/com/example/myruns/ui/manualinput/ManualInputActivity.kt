@@ -25,6 +25,7 @@ import com.example.myruns.ui.ExerciseViewModelFactory
 import com.example.myruns.ui.InputDialogFragment
 import com.example.myruns.ui.InputDialogListener
 import com.example.myruns.ui.SettingsFragment
+import com.example.myruns.ui.StartFragment
 import com.google.android.material.textfield.TextInputLayout
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -33,6 +34,10 @@ import java.util.Calendar
  * activity that allows the user to manually create an ExerciseEntry
  */
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, InputDialogListener {
+    companion object {
+        const val ACTIVITY_TYPE_KEY = "activity_type_key"
+    }
+
     private val dateSelector by lazy { findViewById<EditText>(R.id.date_selector) }
     private val timeSelector by lazy { findViewById<EditText>(R.id.time_selector) }
     private val durationSelector by lazy { findViewById<EditText>(R.id.duration_selector) }
@@ -60,6 +65,10 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             this,
             viewModelFactory
         )[ManualInputViewModel::class.java]
+
+
+        manualInputViewModel.activityType =
+            intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
 
         initializeListeners()
         initializeObservers()
