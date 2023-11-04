@@ -49,7 +49,7 @@ class ExerciseEntryAdapter(
             inputType.text = exerciseEntry.inputType
             activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
-            duration.text = (exerciseEntry.duration?.toString() ?: "0") + " secs"
+            duration.text = (exerciseEntry.duration?.toString() ?: "0") + " mins"
 
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->
                 if (unitPref == SettingsFragment.UNIT_METRIC) {

@@ -56,7 +56,7 @@
         android:hint="Duration"
         app:startIconDrawable="@drawable/baseline_timelapse_24"
         style="@style/TextInputLayout"
-        app:suffixText="secs">
+        app:suffixText="mins">
 
         <EditText
             android:id="@+id/duration_selector"
