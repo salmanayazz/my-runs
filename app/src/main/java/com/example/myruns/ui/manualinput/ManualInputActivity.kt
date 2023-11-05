@@ -261,9 +261,9 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         try {
             when (manualInputViewModel.dialogOpen.value) {
                 ManualInputViewModel.DialogOptions.DURATION ->
-                    manualInputViewModel.duration.value = data.toInt()
+                    manualInputViewModel.duration.value = data.toDouble()
                 ManualInputViewModel.DialogOptions.DISTANCE ->
-                    manualInputViewModel.distance.value = data.toInt()
+                    manualInputViewModel.distance.value = data.toDouble()
                 ManualInputViewModel.DialogOptions.CALORIES ->
                     manualInputViewModel.calories.value = data.toDouble()
                 ManualInputViewModel.DialogOptions.HEART_RATE ->

@@ -31,7 +31,7 @@ class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
         } else {
             exerciseEntries.map { entries ->
                 entries.map { entry ->
-                    entry.copy(distance = entry.distance?.times(kmToMilesConversion)?.roundToInt())
+                    entry.copy(distance = entry.distance?.times(kmToMilesConversion))
                 }
             }
         }
@@ -49,7 +49,7 @@ class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
         var exerciseEntryCopy = exerciseEntry
         if (unitType == SettingsFragment.UNIT_IMPERIAL) {
 
-            exerciseEntryCopy = exerciseEntry.copy(distance = exerciseEntry.distance?.div(kmToMilesConversion)?.roundToInt())
+            exerciseEntryCopy = exerciseEntry.copy(distance = exerciseEntry.distance?.div(kmToMilesConversion))
             println("the value was miles ${exerciseEntryCopy.distance}")
         }
         CoroutineScope(IO).launch {

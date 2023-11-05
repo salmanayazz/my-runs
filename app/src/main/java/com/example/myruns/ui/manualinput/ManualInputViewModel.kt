@@ -32,8 +32,8 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
 
     var dateTime = MutableLiveData(Calendar.getInstance())
 
-    var duration = MutableLiveData<Int>()
-    var distance = MutableLiveData<Int>()
+    var duration = MutableLiveData<Double>()
+    var distance = MutableLiveData<Double>()
     var calories = MutableLiveData<Double>()
     var heartRate = MutableLiveData<Double>()
     var comments = MutableLiveData<String>()
@@ -55,7 +55,7 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
                 dateTime.value,
                 duration.value,
                 distance.value,
-                0,
+                0.0,
                 calories.value,
                 0.0,
                 heartRate.value,
