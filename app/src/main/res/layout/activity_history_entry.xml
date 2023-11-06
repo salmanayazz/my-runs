@@ -75,8 +75,7 @@
             android:layout_height="wrap_content"
             android:hint="Duration"
             app:startIconDrawable="@drawable/baseline_timelapse_24"
-            style="@style/TextInputLayout"
-            app:suffixText="mins">
+            style="@style/TextInputLayout">
 
             <EditText
                 android:id="@+id/duration"

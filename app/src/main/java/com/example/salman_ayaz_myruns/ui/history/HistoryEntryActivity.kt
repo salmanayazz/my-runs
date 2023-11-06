@@ -90,8 +90,13 @@ class HistoryEntryActivity : AppCompatActivity() {
                 ).show()
             }
 
+            // get mins and secs individually
+            val mins = (exerciseEntry!!.duration?.toInt()?.toString() ?: "0") + " mins"
+            // get decimal part of the duration
+            val secs = ((exerciseEntry!!.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
+
             findViewById<EditText>(R.id.duration)
-                .setText(exerciseEntry!!.duration?.toString() ?: "")
+                .setText(mins + " " + secs)
 
             findViewById<EditText>(R.id.distance)
                 .setText(exerciseEntry!!.distance?.toString() ?: "")
