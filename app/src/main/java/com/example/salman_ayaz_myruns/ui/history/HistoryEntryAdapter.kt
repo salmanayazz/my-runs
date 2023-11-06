@@ -45,7 +45,11 @@ class ExerciseEntryAdapter(
             inputType.text = exerciseEntry.inputType
             activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
-            duration.text = (exerciseEntry.duration?.toString() ?: "0") + " mins"
+            
+            val mins = (exerciseEntry.duration?.toInt()?.toString() ?: "0") + " mins"
+            // get decimal part of the duration
+            val secs = ((exerciseEntry.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
+            duration.text = mins + " " + secs
 
             // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->

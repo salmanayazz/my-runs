@@ -116,28 +116,28 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             ManualInputViewModel.DialogOptions.DURATION,
             "",
             "Duration",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             distanceSelector,
             ManualInputViewModel.DialogOptions.DISTANCE,
             "",
             "Distance",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             caloriesSelector,
             ManualInputViewModel.DialogOptions.CALORIES,
             "",
             "Calories",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             heartRateSelector,
             ManualInputViewModel.DialogOptions.HEART_RATE,
             "",
             "Heart Rate",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             commentsSelector,
@@ -153,6 +153,11 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             finish()
         }
         findViewById<Button>(R.id.button_cancel).setOnClickListener {
+            Toast.makeText(
+                this,
+                "Entry Discarded",
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
         }
     }
