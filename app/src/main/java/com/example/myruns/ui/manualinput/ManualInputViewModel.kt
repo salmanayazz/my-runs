@@ -5,9 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
 import com.example.myruns.ui.StartFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import java.util.Calendar
 
 /**

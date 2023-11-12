@@ -6,7 +6,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
-import com.example.myruns.ui.SettingsFragment
 import kotlinx.coroutines.flow.Flow
 
 /**

@@ -1,14 +1,11 @@
 package com.example.myruns.data.exercise
 
-import android.content.Context
-import androidx.preference.PreferenceManager
 import com.example.myruns.ui.SettingsFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 /**
  * repository for the ExerciseEntry database

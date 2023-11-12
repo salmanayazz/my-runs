@@ -3,12 +3,9 @@ package com.example.myruns.ui.history
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.example.myruns.R
@@ -93,8 +90,13 @@ class HistoryEntryActivity : AppCompatActivity() {
                 ).show()
             }
 
+            // get mins and secs individually
+            val mins = (exerciseEntry!!.duration?.toInt()?.toString() ?: "0") + " mins"
+            // get decimal part of the duration
+            val secs = ((exerciseEntry!!.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
+
             findViewById<EditText>(R.id.duration)
-                .setText(exerciseEntry!!.duration?.toString() ?: "")
+                .setText(mins + " " + secs)
 
             findViewById<EditText>(R.id.distance)
                 .setText(exerciseEntry!!.distance?.toString() ?: "")

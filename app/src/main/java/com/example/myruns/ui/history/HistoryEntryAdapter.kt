@@ -1,14 +1,10 @@
 package com.example.myruns.ui.history
 
-import android.content.Context
 import android.content.Intent
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myruns.R
@@ -17,7 +13,6 @@ import com.example.myruns.ui.SettingsFragment
 import com.example.myruns.ui.StartFragment
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
-import java.io.Serializable
 
 /**
  * adapter for the RecyclerView in HistoryFragment
@@ -50,7 +45,11 @@ class ExerciseEntryAdapter(
             inputType.text = exerciseEntry.inputType
             activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
-            duration.text = (exerciseEntry.duration?.toString() ?: "0") + " mins"
+            
+            val mins = (exerciseEntry.duration?.toInt()?.toString() ?: "0") + " mins"
+            // get decimal part of the duration
+            val secs = ((exerciseEntry.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
+            duration.text = mins + " " + secs
 
             // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->

@@ -2,7 +2,6 @@ package com.example.myruns.ui.manualinput
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
@@ -13,9 +12,6 @@ import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TimePicker
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.example.myruns.R
@@ -25,7 +21,6 @@ import com.example.myruns.ui.ExerciseViewModelFactory
 import com.example.myruns.ui.InputDialogFragment
 import com.example.myruns.ui.InputDialogListener
 import com.example.myruns.ui.SettingsFragment
-import com.example.myruns.ui.StartFragment
 import com.google.android.material.textfield.TextInputLayout
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -121,28 +116,28 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             ManualInputViewModel.DialogOptions.DURATION,
             "",
             "Duration",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             distanceSelector,
             ManualInputViewModel.DialogOptions.DISTANCE,
             "",
             "Distance",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             caloriesSelector,
             ManualInputViewModel.DialogOptions.CALORIES,
             "",
             "Calories",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             heartRateSelector,
             ManualInputViewModel.DialogOptions.HEART_RATE,
             "",
             "Heart Rate",
-            InputType.TYPE_CLASS_NUMBER
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         )
         onClickInputFragment(
             commentsSelector,
@@ -158,6 +153,11 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             finish()
         }
         findViewById<Button>(R.id.button_cancel).setOnClickListener {
+            Toast.makeText(
+                this,
+                "Entry Discarded",
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
         }
     }
