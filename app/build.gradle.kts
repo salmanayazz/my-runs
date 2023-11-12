@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.salman_ayaz_myruns"
+    namespace = "com.example.myruns"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.salman_ayaz_myruns"
+        applicationId = "com.example.myruns"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
