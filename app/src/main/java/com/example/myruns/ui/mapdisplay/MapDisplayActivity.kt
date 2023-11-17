@@ -2,26 +2,20 @@ package com.example.myruns.ui.mapdisplay
 
 import android.Manifest
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.os.Message
-import android.os.Messenger
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.myruns.ExerciseEntryListener
 import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseRepository
@@ -32,13 +26,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.myruns.databinding.ActivityMapDisplayBinding
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private val FINE_LOCATION_REQUEST_CODE = 0
@@ -48,7 +38,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapDisplayViewModel: MapDisplayViewModel
 
     private lateinit var  markerOptions: MarkerOptions
-    private lateinit var serviceMessenger: Messenger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +65,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         findViewById<Button>(R.id.confirm).setOnClickListener() {
+
             finish()
         }
         findViewById<Button>(R.id.cancel).setOnClickListener() {
@@ -85,8 +75,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         markerOptions = MarkerOptions()
     }
-
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -125,47 +113,17 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun startTrackingService() {
         val serviceIntent = Intent(this, TrackingService::class.java)
         this.startService(serviceIntent)
-
-        val filter = IntentFilter(TrackingService.EXERCISE_ENTRY_EVENT)
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
     }
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            println("on received")
-            val byteArrayExtra = intent?.getByteArrayExtra(TrackingService.EXERCISE_ENTRY_KEY)
-            if (byteArrayExtra != null) {
-                val byteArrayInputStream = ByteArrayInputStream(byteArrayExtra)
-                val objectInputStream = ObjectInputStream(byteArrayInputStream)
-                try {
-                    val editingExerciseEntry = objectInputStream.readObject() as? ExerciseEntry
-
-                    lifecycleScope.launch {
-                        // Handle the exerciseEntry here
-
-                        if (editingExerciseEntry != null) {
-                            if (editingExerciseEntry.locationList != null) {
-                                val cameraUpdate =
-                                    CameraUpdateFactory.newLatLngZoom(editingExerciseEntry.locationList.last(), 17f)
-                                mMap.animateCamera(cameraUpdate)
-                                markerOptions.position(editingExerciseEntry.locationList.last())
-                                mMap.addMarker(markerOptions)
-                            }
-                        }
-                    }
-                    // Use the receivedExerciseEntry as needed
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    objectInputStream.close()
-                    byteArrayInputStream.close()
-                }
-
-
-            }
-        }
+    private fun stopTrackingService() {
+        val intent = Intent()
+        intent.action = TrackingService.STOP_SERVICE_ACTION
+        sendBroadcast(intent)
     }
 
+    /**
+     * the receiver for ExerciseEntry events from the TrackingService
+     */
     private val exerciseEntryReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let {
@@ -179,20 +137,23 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
                         it.getParcelableExtra(TrackingService.EXERCISE_ENTRY_KEY)
                     }
 
-                    onExerciseEntryReceived(exerciseEntry)
+                    updateMap(exerciseEntry)
                 }
             }
         }
     }
 
-    private fun onExerciseEntryReceived(exerciseEntry: ExerciseEntry?) {
+    /**
+     * updates the map with the data from the given ExerciseEntry
+     * @param exerciseEntry
+     * the ExerciseEntry to update the map with
+     */
+    private fun updateMap(exerciseEntry: ExerciseEntry?) {
         lifecycleScope.launch {
-            // Handle the exerciseEntry here
-
             if (exerciseEntry != null) {
                 if (exerciseEntry.locationList != null) {
-                    val cameraUpdate =
-                        CameraUpdateFactory.newLatLngZoom(exerciseEntry.locationList.last(), 17f)
+                    // draw a pointer on the last location
+                    val cameraUpdate = CameraUpdateFactory.newLatLngZoom(exerciseEntry.locationList.last(), 17f)
                     mMap.animateCamera(cameraUpdate)
                     markerOptions.position(exerciseEntry.locationList.last())
                     mMap.addMarker(markerOptions)
@@ -212,21 +173,23 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
     override fun onResume() {
         super.onResume()
+        // restart the tracking service receiver
         val filter = IntentFilter(TrackingService.EXERCISE_ENTRY_EVENT)
         registerReceiver(exerciseEntryReceiver, filter)
     }
 
     override fun onPause() {
         super.onPause()
+        // stop the tracking service receiver
         unregisterReceiver(exerciseEntryReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopTrackingService()
     }
 }
