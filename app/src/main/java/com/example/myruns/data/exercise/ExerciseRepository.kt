@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.lifecycle.MutableLiveData
 
 /**
  * repository for the ExerciseEntry database
@@ -16,12 +17,12 @@ class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
     private val kmToMilesConversion = 0.621371
 
     /**
-     * returns a Flow of all comments in the database
+     * returns a Flow of all ExerciseEntries in the database
      * @param unitType 
      * the unit type to display the distance in
      * which should be either SettingsFragment.UNIT_METRIC or SettingsFragment.UNIT_IMPERIAL
      */
-    fun allComments(unitType: String): Flow<List<ExerciseEntry>> {
+    fun allExerciseEntries(unitType: String): Flow<List<ExerciseEntry>> {
         val exerciseEntries = exerciseDatabaseDao.getAllExercises()
         return if (unitType == SettingsFragment.UNIT_METRIC) {
             exerciseEntries

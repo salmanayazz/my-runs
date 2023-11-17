@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myruns.R
@@ -73,14 +74,20 @@ class ExerciseEntryAdapter(
         
         // click listener that opens HistoryEntryActivity
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java)
+            //val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java)
             // sends a byte array of the ExerciseEntry to the HistoryEntryActivity
-            val byteArray = ByteArrayOutputStream()
-            val out = ObjectOutputStream(byteArray)
-            out.writeObject(exerciseEntry)
-            out.close()
-            intent.putExtra(HistoryEntryActivity.EXERCISE_ENTRY, byteArray.toByteArray())
+//            val byteArray = ByteArrayOutputStream()
+//            val out = ObjectOutputStream(byteArray)
+//            out.writeObject(exerciseEntry)
+//            out.close()
+//            intent.putExtra(HistoryEntryActivity.EXERCISE_ENTRY, byteArray.toByteArray())
+//            holder.itemView.context.startActivity(intent)
+
+            val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java).apply {
+                putExtra(HistoryEntryActivity.EXERCISE_ENTRY, exerciseEntry)
+            }
             holder.itemView.context.startActivity(intent)
+
         }
     }
 

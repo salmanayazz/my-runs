@@ -24,7 +24,7 @@ class HistoryViewModel(private val repository: ExerciseRepository) : ViewModel()
     init {
         // set up an observer on the unitPreference LiveData
         unitPreference.observeForever { unitType ->
-            val newExerciseEntries = repository.allComments(unitType)
+            val newExerciseEntries = repository.allExerciseEntries(unitType)
             exerciseEntriesSource.value = newExerciseEntries
         }
     }

@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.myruns.data.CalendarTypeConverter
+import com.example.myruns.data.LatLngTypeConverter
 
 /**
  * database for the ExerciseEntry class
  */
 @Database(entities = [ExerciseEntry::class], version = 1)
-@TypeConverters(CalendarTypeConverter::class)
+@TypeConverters(CalendarTypeConverter::class, LatLngTypeConverter::class)
 abstract class ExerciseDatabase : RoomDatabase() {
     abstract val exerciseDatabaseDao: ExerciseDatabaseDao
 

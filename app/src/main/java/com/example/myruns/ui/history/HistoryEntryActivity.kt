@@ -1,5 +1,6 @@
 package com.example.myruns.ui.history
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +13,7 @@ import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
-import com.example.myruns.ui.ExerciseViewModelFactory
+import com.example.myruns.data.exercise.ExerciseViewModelFactory
 import com.example.myruns.ui.SettingsFragment
 import com.google.android.material.textfield.TextInputLayout
 import java.io.ByteArrayInputStream
@@ -35,8 +36,7 @@ class HistoryEntryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_entry)
 
-        // get the ExerciseEntry as a byte array
-        val exerciseByteArr = intent.getByteArrayExtra(EXERCISE_ENTRY)
+
 
         // setup mvvm objects
         var database = ExerciseDatabase.getInstance(this)
@@ -48,16 +48,31 @@ class HistoryEntryActivity : AppCompatActivity() {
             viewModelFactory
         )[HistoryViewModel::class.java]
 
-        try {
-            // parse into ExerciseEntry if not null
-            exerciseEntry = ObjectInputStream(
-                ByteArrayInputStream(exerciseByteArr)
-            ).readObject() as ExerciseEntry
+//        // get the ExerciseEntry as a byte array
+//        val exerciseByteArr = intent.getByteArrayExtra(EXERCISE_ENTRY)
 
-            populateText()
-        } catch (e: Exception) {
-            println(e.printStackTrace())
+//        try {
+//            // parse into ExerciseEntry if not null
+//            exerciseEntry = ObjectInputStream(
+//                ByteArrayInputStream(exerciseByteArr)
+//            ).readObject() as ExerciseEntry
+//
+//            populateText()
+//        } catch (e: Exception) {
+//            println(e.printStackTrace())
+//        }
+
+        exerciseEntry = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXERCISE_ENTRY, ExerciseEntry::class.java)
+        } else {
+            intent.getParcelableExtra(EXERCISE_ENTRY)
         }
+
+        if (exerciseEntry == null) {
+            Log.e("HistoryEntryActivity", "passed ExerciseEntry is null")
+        }
+
+        populateText()
 
         // delete entry onClick
         findViewById<ImageView>(R.id.delete_entry).setOnClickListener() {
