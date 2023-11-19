@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.example.myruns.R
+import com.example.myruns.Utils.getParcelableExtraCompat
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
@@ -36,8 +37,6 @@ class HistoryEntryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_entry)
 
-
-
         // setup mvvm objects
         var database = ExerciseDatabase.getInstance(this)
         var databaseDao = database.exerciseDatabaseDao
@@ -48,25 +47,10 @@ class HistoryEntryActivity : AppCompatActivity() {
             viewModelFactory
         )[HistoryViewModel::class.java]
 
-//        // get the ExerciseEntry as a byte array
-//        val exerciseByteArr = intent.getByteArrayExtra(EXERCISE_ENTRY)
-
-//        try {
-//            // parse into ExerciseEntry if not null
-//            exerciseEntry = ObjectInputStream(
-//                ByteArrayInputStream(exerciseByteArr)
-//            ).readObject() as ExerciseEntry
-//
-//            populateText()
-//        } catch (e: Exception) {
-//            println(e.printStackTrace())
-//        }
-
-        exerciseEntry = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXERCISE_ENTRY, ExerciseEntry::class.java)
-        } else {
-            intent.getParcelableExtra(EXERCISE_ENTRY)
-        }
+        exerciseEntry = intent.getParcelableExtraCompat(
+            EXERCISE_ENTRY,
+            ExerciseEntry::class.java
+        )
 
         if (exerciseEntry == null) {
             Log.e("HistoryEntryActivity", "passed ExerciseEntry is null")

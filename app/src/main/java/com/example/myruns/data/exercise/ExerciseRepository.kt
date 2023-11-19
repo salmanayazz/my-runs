@@ -55,7 +55,6 @@ class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
         }
     }
 
-
     /**
      * deletes an exercise entry from the database
      * @param id 

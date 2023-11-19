@@ -12,6 +12,7 @@ import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.ui.SettingsFragment
 import com.example.myruns.ui.StartFragment
+import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 
@@ -44,7 +45,11 @@ class ExerciseEntryAdapter(
         fun bind(exerciseEntry: ExerciseEntry) {
             // populate TextViews with ExerciseEntry data
             inputType.text = exerciseEntry.inputType
-            activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
+            if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
+                activityType.text = "Unknown"
+            } else {
+                activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
+            }
             dateTime.text = exerciseEntry.dateTime?.time.toString()
             
             val mins = (exerciseEntry.duration?.toInt()?.toString() ?: "0") + " mins"
@@ -74,18 +79,18 @@ class ExerciseEntryAdapter(
         
         // click listener that opens HistoryEntryActivity
         holder.itemView.setOnClickListener {
-            //val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java)
-            // sends a byte array of the ExerciseEntry to the HistoryEntryActivity
-//            val byteArray = ByteArrayOutputStream()
-//            val out = ObjectOutputStream(byteArray)
-//            out.writeObject(exerciseEntry)
-//            out.close()
-//            intent.putExtra(HistoryEntryActivity.EXERCISE_ENTRY, byteArray.toByteArray())
-//            holder.itemView.context.startActivity(intent)
 
-            val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java).apply {
-                putExtra(HistoryEntryActivity.EXERCISE_ENTRY, exerciseEntry)
+            // open HistoryEntryActivity or MapViewActivity based on ExerciseEntry inputType
+            val intent = if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_MANUAL) {
+                Intent(holder.itemView.context, HistoryEntryActivity::class.java).apply {
+                    putExtra(HistoryEntryActivity.EXERCISE_ENTRY, exerciseEntry)
+                }
+            } else {
+                Intent(holder.itemView.context, MapDisplayActivity::class.java).apply {
+                    putExtra(MapDisplayActivity.EXERCISE_ENTRY_KEY, exerciseEntry)
+                }
             }
+
             holder.itemView.context.startActivity(intent)
 
         }

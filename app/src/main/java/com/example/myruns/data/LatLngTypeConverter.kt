@@ -1,51 +1,31 @@
 package com.example.myruns.data
 
-import android.os.Build
-import android.os.Parcel
 import androidx.room.TypeConverter
-import com.example.myruns.TrackingService
-import com.example.myruns.data.exercise.ExerciseEntry
 import com.google.android.gms.maps.model.LatLng
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.io.Serializable
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class LatLngTypeConverter {
+    
+    /**
+     * converts an ArrayList of LatLngs to a string
+     * @param value
+     * the ArrayList of LatLngs to convert
+     */
     @TypeConverter
-    fun fromLatLngList(latLngList: ArrayList<LatLng>?): ByteArray? {
-        if (latLngList == null) return null
-
-        val parcel = Parcel.obtain()
-        latLngList.forEach {
-            parcel.writeParcelable(it, 0)
-        }
-        val byteArray = parcel.marshall()
-        parcel.recycle()
-
-        return byteArray
+    fun fromLatLngList(value: ArrayList<LatLng>?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
     }
 
+    /**
+     * converts a string to an ArrayList of LatLngs
+     * @param value
+     * the string to convert
+     */
     @TypeConverter
-    fun toLatLngList(byteArray: ByteArray?): ArrayList<LatLng>? {
-        if (byteArray == null) return null
-
-        val parcel = Parcel.obtain()
-        parcel.unmarshall(byteArray, 0, byteArray.size)
-        parcel.setDataPosition(0)
-
-        val latLngList = ArrayList<LatLng>()
-        while (parcel.dataAvail() > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                latLngList.add(parcel.readParcelable(LatLng::class.java.classLoader, LatLng::class.java)!!)
-            } else {
-                latLngList.add(parcel.readParcelable(LatLng::class.java.classLoader)!!)
-            }
-        }
-
-        parcel.recycle()
-        return latLngList
+    fun toLatLngList(value: String?): ArrayList<LatLng>? {
+        val listType = object : TypeToken<ArrayList<LatLng>>() {}.type
+        return Gson().fromJson(value, listType)
     }
 }

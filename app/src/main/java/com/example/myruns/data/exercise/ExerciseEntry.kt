@@ -54,7 +54,6 @@ data class ExerciseEntry(
     val climb: Double?,
     val heartRate: Double?,
     val comment: String?,
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     val locationList: ArrayList<LatLng>?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
