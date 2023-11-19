@@ -3,6 +3,7 @@ package com.example.myruns
 import android.Manifest
 import android.app.Service
 import android.content.BroadcastReceiver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -27,8 +28,8 @@ import java.util.Calendar
 
 class TrackingService : Service(), LocationListener {
     companion object {
-        val EXERCISE_ENTRY_EVENT = "exercise-entry-event"
-        val EXERCISE_ENTRY_KEY = "exercise-entry-key"
+        val LOCATION_EVENT = "exercise-entry-event"
+        val LOCATION_KEY = "exercise-entry-key"
 
         val STOP_SERVICE_ACTION = "stop-service-action"
     }
@@ -36,20 +37,6 @@ class TrackingService : Service(), LocationListener {
 
     private val stopServiceReceiver by lazy { StopServiceReceiver() }
     private lateinit var locationManager: LocationManager
-    private var editingExerciseEntry: ExerciseEntry = ExerciseEntry(
-        0,
-        StartFragment.INPUT_TYPE_MANUAL, // TODO: change
-        0,
-        Calendar.getInstance(),
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        "",
-        locationList = ArrayList()
-    )
 
     override fun onCreate() {
         checkPermission()
@@ -73,9 +60,6 @@ class TrackingService : Service(), LocationListener {
      * if the app doesn't have the location permission or the build version is less than 23
      */
     private fun checkPermission() {
-        if (Build.VERSION.SDK_INT < 23) {
-            throw SecurityException("Unsupported Build Version");
-        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             throw SecurityException("Location permission not granted");
         }
@@ -105,22 +89,16 @@ class TrackingService : Service(), LocationListener {
      */
     override fun onLocationChanged(location: Location) {
         Log.i("onLocationChanged", "lat: ${location.latitude}, long: ${location.longitude}")
-        val lat = location.latitude
-        val lng = location.longitude
-        val latLng = LatLng(lat, lng)
-
-        editingExerciseEntry.locationList?.add(latLng)
-
-        sendExerciseEntry(editingExerciseEntry)
+        sendLocation(location)
     }
     
     /**
-     * sends an ExerciseEntry to the parent activity/fragment
+     * sends an location to the parent activity/fragment
      */
-    private fun sendExerciseEntry(exerciseEntry: ExerciseEntry) {
+    private fun sendLocation(location: Location) {
         val intent = Intent().apply {
-            action = EXERCISE_ENTRY_EVENT
-            putExtra(EXERCISE_ENTRY_KEY, exerciseEntry)
+            action = LOCATION_EVENT
+            putExtra(LOCATION_KEY, location)
         }
 
         sendBroadcast(intent)

@@ -30,6 +30,8 @@ class StartFragment : Fragment() {
         )
 
         val INPUT_TYPE_MANUAL = inputTypeList[0]
+        val INPUT_TYPE_GPS = inputTypeList[1]
+        val INPUT_TYPE_AUTOMATIC = inputTypeList[2]
     }
 
 
@@ -73,7 +75,6 @@ class StartFragment : Fragment() {
 
         var selectedActivity = 0
         activityType.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            println("activity type: position ${position}")
             selectedActivity = position
         }
 
@@ -86,6 +87,8 @@ class StartFragment : Fragment() {
                     .putExtra(ManualInputActivity.ACTIVITY_TYPE_KEY, selectedActivity)
             } else {
                 Intent(requireContext(), MapDisplayActivity::class.java)
+                    .putExtra(MapDisplayActivity.INPUT_TYPE_KEY, inputTypeList[selectedInput])
+                    .putExtra(MapDisplayActivity.ACTIVITY_TYPE_KEY, selectedActivity)
             }
             startActivity(intent)
         }

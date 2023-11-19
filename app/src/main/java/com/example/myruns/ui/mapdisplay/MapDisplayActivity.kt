@@ -9,8 +9,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -28,22 +28,43 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.myruns.databinding.ActivityMapDisplayBinding
+import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
+import android.location.Location
+import com.example.myruns.ui.StartFragment
+import com.google.android.gms.maps.model.LatLng
+import java.util.Calendar
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
+    companion object {
+        const val INPUT_TYPE_KEY = "input-type-key"
+        const val ACTIVITY_TYPE_KEY = "activity-type-key"
+        const val EXERCISE_ENTRY_KEY = "exercise-entry-key"
+    }
+
     private val FINE_LOCATION_REQUEST_CODE = 0
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapDisplayBinding
     private lateinit var mapDisplayViewModel: MapDisplayViewModel
-
     private lateinit var  markerOptions: MarkerOptions
+    private lateinit var  polylineOptions: PolylineOptions
+    private var mapCentered = false
+
+    private val gmsLocationList = ArrayList<Location>()
+    private val exerciseStats by lazy { findViewById<TextView>(R.id.exercise_stats) }
+
+    private var inputType: String = StartFragment.inputTypeList[0]
+    private var activityType: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapDisplayBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        markerOptions = MarkerOptions()
+        polylineOptions = PolylineOptions()
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -52,28 +73,21 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         checkPermission()
 
-        // setup mvvm objects
-        val database = ExerciseDatabase.getInstance(applicationContext)
-        val databaseDao = database.exerciseDatabaseDao
-        val repository = ExerciseRepository(databaseDao)
-        val viewModelFactory = ExerciseViewModelFactory(repository)
-        mapDisplayViewModel = ViewModelProvider(
-            this,
-            viewModelFactory
-        )[MapDisplayViewModel::class.java]
-
-
+        setupMVVM()
 
         findViewById<Button>(R.id.confirm).setOnClickListener() {
-
             finish()
         }
         findViewById<Button>(R.id.cancel).setOnClickListener() {
             finish()
         }
 
+        val intentInputType = intent.getStringExtra(INPUT_TYPE_KEY)
 
-        markerOptions = MarkerOptions()
+        if (intentInputType != null) {
+            inputType = intentInputType
+        }
+        activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
     }
 
     override fun onRequestPermissionsResult(
@@ -93,21 +107,28 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
                     "Please enable location permissions",
                     Toast.LENGTH_SHORT
                 ).show()
+                finish()
             }
         }
     }
 
-
-
     private fun checkPermission() {
-        if (Build.VERSION.SDK_INT < 23) {
-            throw SecurityException("test")
-        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_REQUEST_CODE)
         } else {
             startTrackingService()
         }
+    }
+
+    private fun setupMVVM() {
+        val database = ExerciseDatabase.getInstance(applicationContext)
+        val databaseDao = database.exerciseDatabaseDao
+        val repository = ExerciseRepository(databaseDao)
+        val viewModelFactory = ExerciseViewModelFactory(repository)
+        mapDisplayViewModel = ViewModelProvider(
+            this,
+            viewModelFactory
+        )[MapDisplayViewModel::class.java]
     }
 
     private fun startTrackingService() {
@@ -124,24 +145,79 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     /**
      * the receiver for ExerciseEntry events from the TrackingService
      */
-    private val exerciseEntryReceiver = object : BroadcastReceiver() {
+    private val locationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let {
-                if (it.action == TrackingService.EXERCISE_ENTRY_EVENT) {
-                    val exerciseEntry = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (it.action == TrackingService.LOCATION_EVENT) {
+                    val gmsLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         it.getParcelableExtra(
-                            TrackingService.EXERCISE_ENTRY_KEY,
-                            ExerciseEntry::class.java
+                            TrackingService.LOCATION_KEY,
+                            Location::class.java
                         )
                     } else {
-                        it.getParcelableExtra(TrackingService.EXERCISE_ENTRY_KEY)
+                        it.getParcelableExtra(TrackingService.LOCATION_KEY)
                     }
 
+                    if (gmsLocation == null) { return }
+
+                    gmsLocationList.add(gmsLocation)
+                    val exerciseEntry = gmsLocationToExerciseActivity(gmsLocationList)
+
                     updateMap(exerciseEntry)
+                    updateExerciseStats(exerciseEntry)
                 }
             }
         }
     }
+
+    private fun gmsLocationToExerciseActivity(gmsLocationList: ArrayList<Location>): ExerciseEntry {
+        val avgPace = if (gmsLocationList.isNotEmpty()) {
+            val totalSpeed = gmsLocationList.sumOf { it.speed.toDouble() }
+            totalSpeed / gmsLocationList.size * 3.6 // convert from m/s to k/h
+        } else {
+            0.0
+        }
+
+        val locationList = ArrayList<LatLng>(gmsLocationList.map {
+            LatLng(it.latitude, it.longitude)
+        })
+
+        val climb = (gmsLocationList.first().altitude - gmsLocationList.last().altitude) / 1000
+
+        var lastGmsLocation = gmsLocationList.firstOrNull()
+        val distance = gmsLocationList.drop(1).fold(0.0) { total, currentLocation ->
+            lastGmsLocation?.let { lastLocation ->
+                val result = FloatArray(1)
+                Location.distanceBetween(
+                    lastLocation.latitude,
+                    lastLocation.longitude,
+                    currentLocation.latitude,
+                    currentLocation.longitude,
+                    result
+                )
+                lastGmsLocation = currentLocation
+                total + (result[0] / 1000) // convert from m to km
+            } ?: total
+        }
+
+        val calories = (distance * 0.035)
+
+        return  ExerciseEntry(
+            0,
+            inputType,
+            0,
+            Calendar.getInstance(),
+            null,
+            distance,
+            avgPace,
+            calories,
+            climb,
+            null,
+            null,
+            locationList
+        )
+    }
+
 
     /**
      * updates the map with the data from the given ExerciseEntry
@@ -151,16 +227,54 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun updateMap(exerciseEntry: ExerciseEntry?) {
         lifecycleScope.launch {
             if (exerciseEntry != null) {
-                if (exerciseEntry.locationList != null) {
-                    // draw a pointer on the last location
-                    val cameraUpdate = CameraUpdateFactory.newLatLngZoom(exerciseEntry.locationList.last(), 17f)
-                    mMap.animateCamera(cameraUpdate)
-                    markerOptions.position(exerciseEntry.locationList.last())
-                    mMap.addMarker(markerOptions)
+                val locationList = exerciseEntry.locationList
+
+                if (locationList != null && locationList.size >= 2) {
+                    // clear prev data
+                    mMap.clear()
+
+                    // markers for beginning and end
+                    mMap.addMarker(MarkerOptions().position(locationList.first()).title("Start"))
+                    mMap.addMarker(MarkerOptions().position(locationList.last()).title("End"))
+
+                    // draw polyline for all other locations
+                    val polylineOptions = PolylineOptions().addAll(locationList)
+                    mMap.addPolyline(polylineOptions)
+
+                    // center camera
+                    if (!mapCentered) {
+                        val cameraUpdate =
+                            CameraUpdateFactory.newLatLngZoom(locationList.last(), 100f)
+                        mMap.animateCamera(cameraUpdate)
+                        mapCentered = true
+                    }
                 }
             }
         }
     }
+
+    /**
+     *
+     */
+    private fun updateExerciseStats(exerciseEntry: ExerciseEntry?) {
+        if (exerciseEntry == null) { return }
+
+        var text = if (inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
+            "Activity Type: Unknown\n"
+        } else {
+            "Activity Type: ${StartFragment.activityTypeList[activityType]}\n"
+        }
+
+        text += "Average Speed: ${exerciseEntry.avgPace} km/h\n" +
+                "Current Speed: ${gmsLocationList.last().speed * 3.6} km/h\n" +
+                "Climb: ${exerciseEntry.climb} km\n" +
+                "Calories: ${exerciseEntry.calories}\n" +
+                "Distance: ${exerciseEntry.distance} km"
+
+        exerciseStats.text = text
+    }
+
+
 
     /**
      * Manipulates the map once available.
@@ -178,14 +292,14 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         // restart the tracking service receiver
-        val filter = IntentFilter(TrackingService.EXERCISE_ENTRY_EVENT)
-        registerReceiver(exerciseEntryReceiver, filter)
+        val filter = IntentFilter(TrackingService.LOCATION_EVENT)
+        registerReceiver(locationReceiver, filter)
     }
 
     override fun onPause() {
         super.onPause()
         // stop the tracking service receiver
-        unregisterReceiver(exerciseEntryReceiver)
+        unregisterReceiver(locationReceiver)
     }
 
     override fun onDestroy() {

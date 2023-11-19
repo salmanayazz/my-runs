@@ -29,11 +29,11 @@ import java.util.Calendar
  * the distance in kilometers 
  * (the db stores the distance in kilometers and converts if needed)
  * @param avgPace
- * TODO
+ * speed in km/h
  * @param calories
  * the amount of calories burned
  * @param climb
- * TODO
+ * height climbed in km (will be negative if downhill)
  * @param heartRate
  * heart rate in bpm
  * @param comment
@@ -49,7 +49,7 @@ data class ExerciseEntry(
     val dateTime: Calendar?,
     val duration: Double?,
     val distance: Double?,
-    val avgPace: Double?,
+    var avgPace: Double?,
     val calories: Double?,
     val climb: Double?,
     val heartRate: Double?,
