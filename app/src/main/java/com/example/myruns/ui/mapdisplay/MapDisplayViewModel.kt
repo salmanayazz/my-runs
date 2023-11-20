@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class MapDisplayViewModel(private val repository: ExerciseRepository): ViewModel() {
     fun insert(exerciseEntry: ExerciseEntry) {
-        repository.insert(exerciseEntry, SettingsFragment.UNIT_METRIC) // TODO: change depending on user's preference
+        // the unit type is always metric
+        repository.insert(exerciseEntry, SettingsFragment.UNIT_METRIC)
     }
 
     fun delete(id: Long) {

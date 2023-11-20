@@ -14,7 +14,7 @@ import androidx.lifecycle.MutableLiveData
  * the dao for the ExerciseEntry database
  */
 class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
-    private val kmToMilesConversion = 0.621371
+    private val kmToMilesConversion = SettingsFragment.KM_TO_MILES
 
     /**
      * returns a Flow of all ExerciseEntries in the database

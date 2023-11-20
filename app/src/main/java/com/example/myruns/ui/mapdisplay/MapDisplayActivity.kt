@@ -30,16 +30,21 @@ import com.example.myruns.databinding.ActivityMapDisplayBinding
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 import android.location.Location
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.preference.PreferenceManager
 import com.example.myruns.Utils.getParcelableArrayListCompat
 import com.example.myruns.ui.StartFragment
 import com.google.android.gms.maps.model.LatLng
 import java.util.Calendar
 import com.example.myruns.Utils.getParcelableExtraCompat
+import com.example.myruns.ui.SettingsFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.VisibleRegion
+import java.text.DecimalFormat
+import java.util.Timer
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
@@ -63,13 +68,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private var staticMap = false
     private var exerciseEntry: ExerciseEntry? = null
     private var gmsLocationList = ArrayList<Location>()
+    private var isMetric = true
     private val metersPerSecToKmPerHour = 3.6
+    private var hasStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapDisplayBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        checkUnit()
 
         markerOptions = MarkerOptions()
         polylineOptions = PolylineOptions()
@@ -103,10 +111,25 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             inputType = intentInputType
         }
         activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
+
     }
 
     /**
-     * sets the activity to static mode by removing the 
+     * checks the unit preference in the settings
+     * and sets the isMetric variable accordingly
+     */
+    private fun checkUnit() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val unit = sharedPreferences
+            .getString(
+                SettingsFragment.UNIT_PREFERENCE,
+                SettingsFragment.UNIT_METRIC
+            )
+        isMetric = unit == SettingsFragment.UNIT_METRIC
+    }
+
+    /**
+     * sets the activity to static mode by removing the
      * confirm and cancel buttons and showing the delete button
      */
     private fun setStatic() {
@@ -174,21 +197,11 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             finish()
         }
         findViewById<Button>(R.id.cancel).setOnClickListener() {
-//            startActivity(
-//                Intent(this
-//                    , MainActivity::class.java
-//                )
-//            )
             finish()
         }
         findViewById<AppCompatImageView>(R.id.delete_entry).setOnClickListener() {
             if (exerciseEntry != null && staticMap) {
                 mapDisplayViewModel.delete(exerciseEntry!!.id)
-//                startActivity(
-//                    Intent(this
-//                        , MainActivity::class.java
-//                    )
-//                )
 
             }
             finish()
@@ -198,6 +211,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun startTrackingService() {
         val serviceIntent = Intent(this, TrackingService::class.java)
         this.startService(serviceIntent)
+        hasStarted = true
     }
 
     private fun stopTrackingService() {
@@ -346,21 +360,43 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun updateExerciseStats(exerciseEntry: ExerciseEntry?) {
         if (exerciseEntry == null) { return }
 
+        // build the string based on different parameter, like unit preference, static map, etc.
+        val decimalFormat = DecimalFormat("#.####") // Change the pattern as needed
+
+        var unitMultiply = 1.0
+        var unit = "kilometer"
+        var unitPerHour = "km/h"
+
+        if (!isMetric) {
+            unitMultiply = SettingsFragment.KM_TO_MILES
+            unit = "miles"
+            unitPerHour = "m/h"
+        }
+
         var text = if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
             "Activity Type: Unknown\n"
         } else {
             "Activity Type: ${StartFragment.activityTypeList[activityType]}\n"
         }
 
-        text += "Average Speed: ${exerciseEntry.avgPace} km/h\n"
+        val formattedAvgSpeed = decimalFormat.format(exerciseEntry.avgPace?.times(unitMultiply))
 
+        text += "Average Speed: $formattedAvgSpeed $unitPerHour\n"
+
+        // don't show current speed if map is static
         if (!staticMap && gmsLocationList.isNotEmpty()) {
-            text += "Current Speed: ${gmsLocationList.last().speed * metersPerSecToKmPerHour} km/h\n"
+            val formattedCurrentSpeed = decimalFormat.format(gmsLocationList.last().speed * metersPerSecToKmPerHour * unitMultiply)
+
+            text += "Current Speed: $formattedCurrentSpeed $unitPerHour\n"
         }
 
-        text += "Climb: ${exerciseEntry.climb} km\n" +
-                "Calories: ${exerciseEntry.calories}\n" +
-                "Distance: ${exerciseEntry.distance} km"
+        val formattedClimb = decimalFormat.format(exerciseEntry.climb)
+        val formattedCalories = decimalFormat.format(exerciseEntry.calories)
+        val formattedDistance = decimalFormat.format(exerciseEntry.distance)
+
+        text += "Climb: $formattedClimb $unit\n" +
+                "Calories: $formattedCalories\n" +
+                "Distance: $formattedDistance $unit"
 
         exerciseStats.text = text
     }
@@ -383,8 +419,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        if (!staticMap) {
-            startTrackingService()
+
+        if (!staticMap && hasStarted) {
+            checkPermission()
         }
 
         // restart the tracking service receiver

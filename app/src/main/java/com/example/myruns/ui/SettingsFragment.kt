@@ -21,6 +21,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val UNIT_METRIC = "metric"
         const val UNIT_IMPERIAL = "imperial"
         const val PROFILE_PREFERENCE = "user_profile"
+        const val KM_TO_MILES = 0.621371
     }
 
 

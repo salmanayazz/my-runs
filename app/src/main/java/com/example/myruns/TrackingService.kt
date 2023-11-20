@@ -16,8 +16,10 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 
 class TrackingService : Service(), LocationListener {
@@ -31,20 +33,21 @@ class TrackingService : Service(), LocationListener {
     private val CHANNEL_ID = "Tracking Notification"
     private val NOTIFY_ID = 1
     private val stopServiceReceiver by lazy { StopServiceReceiver() }
+    private var isReceiverRegistered = false
     private val locationManager by lazy { getSystemService(LOCATION_SERVICE) as LocationManager }
     val gmsLocationList = ArrayList<Location>()
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
     override fun onCreate() {
         checkPermission()
-
-        val filter = IntentFilter(STOP_SERVICE_ACTION)
-        registerReceiver(stopServiceReceiver, filter)
+        registerReceiver()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         showNotification()
+        checkPermission()
         startTracking()
+
         return START_STICKY
     }
 
@@ -92,7 +95,12 @@ class TrackingService : Service(), LocationListener {
 
         notificationManager.notify(NOTIFY_ID, notification)
     }
-
+    
+    private fun startMapDisplay() {
+        showNotification()
+        val intent = Intent(this, MapDisplayActivity::class.java)
+        startActivity(intent)
+    }
 
     /**
      * checks if the app has the location permission
@@ -148,8 +156,23 @@ class TrackingService : Service(), LocationListener {
             if (intent.action == STOP_SERVICE_ACTION) {
                 // stop this service when parent activity/fragment sends a broadcast to stop
                 stopSelf()
-                unregisterReceiver(stopServiceReceiver)
+                unregisterReceiver()
             }
+        }
+    }
+
+    private fun registerReceiver() {
+        if (!isReceiverRegistered) {
+            val filter = IntentFilter(STOP_SERVICE_ACTION)
+            LocalBroadcastManager.getInstance(this).registerReceiver(stopServiceReceiver, filter)
+            isReceiverRegistered = true
+        }
+    }
+
+    private fun unregisterReceiver() {
+        if (isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(stopServiceReceiver)
+            isReceiverRegistered = false
         }
     }
 
@@ -159,5 +182,6 @@ class TrackingService : Service(), LocationListener {
             locationManager.removeUpdates(this)
         }
         notificationManager.cancel(NOTIFY_ID)
+        unregisterReceiver()
     }
 }
