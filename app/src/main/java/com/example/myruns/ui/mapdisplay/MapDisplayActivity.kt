@@ -30,7 +30,6 @@ import com.example.myruns.databinding.ActivityMapDisplayBinding
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 import android.location.Location
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.preference.PreferenceManager
@@ -44,7 +43,6 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.VisibleRegion
 import java.text.DecimalFormat
-import java.util.Timer
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
@@ -71,6 +69,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private var isMetric = true
     private val metersPerSecToKmPerHour = 3.6
     private var hasStarted = false
+    private val timeStarted = Calendar.getInstance().timeInMillis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -209,6 +208,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startTrackingService() {
+        println("I HAVE STARTED 2")
         val serviceIntent = Intent(this, TrackingService::class.java)
         this.startService(serviceIntent)
         hasStarted = true
@@ -288,7 +288,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             inputType,
             0,
             Calendar.getInstance(),
-            null,
+            (Calendar.getInstance().timeInMillis - timeStarted).toDouble() / (1000 * 60), // convert milisec to mins
             distance,
             avgPace,
             calories,
@@ -344,6 +344,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * checks if the given marker is in the given visible region
+     */
     private fun isMarkerInBounds(markerPosition: LatLng, visibleRegion: VisibleRegion): Boolean {
         return markerPosition.latitude > visibleRegion.latLngBounds.southwest.latitude &&
                 markerPosition.latitude < visibleRegion.latLngBounds.northeast.latitude &&
@@ -361,7 +364,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         if (exerciseEntry == null) { return }
 
         // build the string based on different parameter, like unit preference, static map, etc.
-        val decimalFormat = DecimalFormat("#.####") // Change the pattern as needed
+        val decimalFormat = DecimalFormat("#.#######")
 
         var unitMultiply = 1.0
         var unit = "kilometer"
@@ -421,6 +424,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onResume()
 
         if (!staticMap && hasStarted) {
+            println("I HAVE STARTED")
             checkPermission()
         }
 

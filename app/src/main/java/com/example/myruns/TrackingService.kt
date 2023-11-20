@@ -40,7 +40,8 @@ class TrackingService : Service(), LocationListener {
 
     override fun onCreate() {
         checkPermission()
-        registerReceiver()
+        val filter = IntentFilter(STOP_SERVICE_ACTION)
+        registerReceiver(stopServiceReceiver, filter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -94,12 +95,6 @@ class TrackingService : Service(), LocationListener {
         }
 
         notificationManager.notify(NOTIFY_ID, notification)
-    }
-    
-    private fun startMapDisplay() {
-        showNotification()
-        val intent = Intent(this, MapDisplayActivity::class.java)
-        startActivity(intent)
     }
 
     /**
@@ -156,23 +151,8 @@ class TrackingService : Service(), LocationListener {
             if (intent.action == STOP_SERVICE_ACTION) {
                 // stop this service when parent activity/fragment sends a broadcast to stop
                 stopSelf()
-                unregisterReceiver()
+                unregisterReceiver(stopServiceReceiver)
             }
-        }
-    }
-
-    private fun registerReceiver() {
-        if (!isReceiverRegistered) {
-            val filter = IntentFilter(STOP_SERVICE_ACTION)
-            LocalBroadcastManager.getInstance(this).registerReceiver(stopServiceReceiver, filter)
-            isReceiverRegistered = true
-        }
-    }
-
-    private fun unregisterReceiver() {
-        if (isReceiverRegistered) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(stopServiceReceiver)
-            isReceiverRegistered = false
         }
     }
 
@@ -182,6 +162,5 @@ class TrackingService : Service(), LocationListener {
             locationManager.removeUpdates(this)
         }
         notificationManager.cancel(NOTIFY_ID)
-        unregisterReceiver()
     }
 }

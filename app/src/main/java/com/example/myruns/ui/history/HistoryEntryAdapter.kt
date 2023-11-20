@@ -15,6 +15,7 @@ import com.example.myruns.ui.StartFragment
 import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
+import java.text.DecimalFormat
 
 /**
  * adapter for the RecyclerView in HistoryFragment
@@ -57,12 +58,14 @@ class ExerciseEntryAdapter(
             val secs = ((exerciseEntry.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
             duration.text = mins + " " + secs
 
+            val decimalFormat = DecimalFormat("#.######")
+            val formattedDistance = decimalFormat.format(exerciseEntry.distance)
             // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->
                 if (unitPref == SettingsFragment.UNIT_METRIC) {
-                    distance.text = (exerciseEntry.distance?.toString() ?: "0") + " kilometers"
+                    distance.text = (formattedDistance?.toString() ?: "0") + " kilometers"
                 } else {
-                    distance.text = (exerciseEntry.distance?.toString() ?: "0") + " miles"
+                    distance.text = (formattedDistance?.toString() ?: "0") + " miles"
                 }
             }
         }

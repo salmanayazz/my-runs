@@ -3,14 +3,9 @@ package com.example.myruns.data.exercise;
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.room.ColumnInfo
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters
-import com.example.myruns.data.CalendarTypeConverter
-import com.example.myruns.data.LatLngTypeConverter
 import com.google.android.gms.maps.model.LatLng
-import java.io.Serializable
 import java.util.Calendar
 
 /**
