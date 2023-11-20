@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyRuns3</string>
+    <string name="app_name">MyRuns</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_map_display">MapDisplayActivity</string>
