@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myruns"
+    namespace = "com.example.salman_ayaz_myruns4"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myruns"
+        applicationId = "com.example.salman_ayaz_myruns4"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -18,7 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        setProperty("archivesBaseName", "myruns")
+        setProperty("archivesBaseName", "salman_ayaz_myruns4")
     }
 
     buildTypes {
