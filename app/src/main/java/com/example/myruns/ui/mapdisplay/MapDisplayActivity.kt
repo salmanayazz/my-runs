@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -31,16 +30,16 @@ import com.example.myruns.databinding.ActivityMapDisplayBinding
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 import android.location.Location
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import com.example.myruns.Utils.getParcelableArrayListCompat
 import com.example.myruns.ui.StartFragment
-import com.example.myruns.ui.history.HistoryEntryActivity
 import com.google.android.gms.maps.model.LatLng
 import java.util.Calendar
 import com.example.myruns.Utils.getParcelableExtraCompat
 import com.google.android.flexbox.FlexboxLayout
-import kotlinx.coroutines.delay
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.VisibleRegion
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
@@ -57,14 +56,13 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private var mapCentered = false
-
-    private val gmsLocationList = ArrayList<Location>()
+    
     private val exerciseStats by lazy { findViewById<TextView>(R.id.exercise_stats) }
-
     private var inputType: String = StartFragment.inputTypeList[0]
     private var activityType: Int = 0
-    private var exerciseEntry: ExerciseEntry? = null
     private var staticMap = false
+    private var exerciseEntry: ExerciseEntry? = null
+    private var gmsLocationList = ArrayList<Location>()
     private val metersPerSecToKmPerHour = 3.6
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,13 +174,24 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             finish()
         }
         findViewById<Button>(R.id.cancel).setOnClickListener() {
+//            startActivity(
+//                Intent(this
+//                    , MainActivity::class.java
+//                )
+//            )
             finish()
         }
         findViewById<AppCompatImageView>(R.id.delete_entry).setOnClickListener() {
             if (exerciseEntry != null && staticMap) {
                 mapDisplayViewModel.delete(exerciseEntry!!.id)
-                finish()
+//                startActivity(
+//                    Intent(this
+//                        , MainActivity::class.java
+//                    )
+//                )
+
             }
+            finish()
         }
     }
 
@@ -206,12 +215,11 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (it.action != TrackingService.LOCATION_EVENT) { return }
 
                 // get google maps service location from service
-                val gmsLocation = intent.getParcelableExtraCompat(
+                gmsLocationList = (intent.getParcelableArrayListCompat(
                     TrackingService.LOCATION_KEY,
                     Location::class.java
-                ) ?: return
+                ) ?: return) as ArrayList<Location>
 
-                gmsLocationList.add(gmsLocation)
                 exerciseEntry = gmsLocationToExerciseActivity(gmsLocationList)
 
                 updateMap(exerciseEntry)
@@ -284,31 +292,49 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun updateMap(exerciseEntry: ExerciseEntry?) {
         lifecycleScope.launch {
-            if (exerciseEntry != null) {
-                val locationList = exerciseEntry.locationList
+            if (exerciseEntry == null) {
+                return@launch
+            }
 
-                if (locationList != null && locationList.size >= 2) {
-                    // clear prev data
-                    mMap.clear()
+            val locationList = exerciseEntry.locationList
 
-                    // markers for beginning and end
-                    mMap.addMarker(MarkerOptions().position(locationList.first()).title("Start"))
-                    mMap.addMarker(MarkerOptions().position(locationList.last()).title("End"))
+            if (locationList != null && locationList.size >= 2) {
+                // clear prev data
+                mMap.clear()
 
-                    // draw polyline for all other locations
-                    val polylineOptions = PolylineOptions().addAll(locationList)
-                    mMap.addPolyline(polylineOptions)
+                // markers for beginning and end
+                val startMarker = MarkerOptions().position(locationList.first()).title("Start")
+                val endMarker = MarkerOptions().position(locationList.last()).title("End")
+                mMap.addMarker(startMarker)
+                mMap.addMarker(endMarker)
 
-                    // center camera
-                    if (!mapCentered) {
-                        val cameraUpdate =
-                            CameraUpdateFactory.newLatLngZoom(locationList.last(), 100f)
-                        mMap.animateCamera(cameraUpdate)
-                        mapCentered = true
-                    }
+                // draw polyline for all other locations
+                val polylineOptions = PolylineOptions().addAll(locationList)
+                mMap.addPolyline(polylineOptions)
+
+                // center camera only if markers are off the screen
+                val visibleRegion = mMap.projection.visibleRegion
+                if (!isMarkerInBounds(startMarker.position, visibleRegion) ||
+                    !isMarkerInBounds(endMarker.position, visibleRegion)
+                ) {
+                    val boundsBuilder = LatLngBounds.builder()
+                        .include(startMarker.position)
+                        .include(endMarker.position)
+
+                    val bounds = boundsBuilder.build()
+
+                    val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 50)
+                    mMap.animateCamera(cameraUpdate)
                 }
             }
         }
+    }
+
+    private fun isMarkerInBounds(markerPosition: LatLng, visibleRegion: VisibleRegion): Boolean {
+        return markerPosition.latitude > visibleRegion.latLngBounds.southwest.latitude &&
+                markerPosition.latitude < visibleRegion.latLngBounds.northeast.latitude &&
+                markerPosition.longitude > visibleRegion.latLngBounds.southwest.longitude &&
+                markerPosition.longitude < visibleRegion.latLngBounds.northeast.longitude
     }
 
 
@@ -357,6 +383,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
+        if (!staticMap) {
+            startTrackingService()
+        }
+
         // restart the tracking service receiver
         val filter = IntentFilter(TrackingService.LOCATION_EVENT)
         registerReceiver(locationReceiver, filter)

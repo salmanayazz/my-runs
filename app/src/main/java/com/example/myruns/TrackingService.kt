@@ -1,9 +1,11 @@
 package com.example.myruns
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -12,19 +14,11 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
-import android.os.Message
-import android.os.RemoteException
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.example.myruns.data.exercise.ExerciseDatabase
-import com.example.myruns.data.exercise.ExerciseEntry
-import com.example.myruns.data.exercise.ExerciseRepository
-import com.example.myruns.ui.StartFragment
-import com.google.android.gms.maps.model.LatLng
-import java.io.Serializable
-import java.util.Calendar
+import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 
 class TrackingService : Service(), LocationListener {
     companion object {
@@ -34,9 +28,12 @@ class TrackingService : Service(), LocationListener {
         val STOP_SERVICE_ACTION = "stop-service-action"
     }
 
-
+    private val CHANNEL_ID = "Tracking Notification"
+    private val NOTIFY_ID = 1
     private val stopServiceReceiver by lazy { StopServiceReceiver() }
-    private lateinit var locationManager: LocationManager
+    private val locationManager by lazy { getSystemService(LOCATION_SERVICE) as LocationManager }
+    val gmsLocationList = ArrayList<Location>()
+    private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
     override fun onCreate() {
         checkPermission()
@@ -46,6 +43,7 @@ class TrackingService : Service(), LocationListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        showNotification()
         startTracking()
         return START_STICKY
     }
@@ -53,6 +51,48 @@ class TrackingService : Service(), LocationListener {
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
+
+    /**
+     * shows a notification to the user that the app is tracking their exercise
+     */
+    private fun showNotification() {
+        // launch MapViewActivity on notification click
+        val intent = Intent(this, MapDisplayActivity::class.java)
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
+            this,
+            CHANNEL_ID
+        )
+
+        notificationBuilder
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText("Recording your exercise")
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.baseline_directions_run_24)
+            .setContentIntent(pendingIntent) // click to open MapDisplayActivity
+            .setOngoing(true) // make the notification undismissable
+
+        val notification = notificationBuilder.build()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                CHANNEL_ID,
+                "Tracking Notification",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        notificationManager.notify(NOTIFY_ID, notification)
+    }
+
 
     /**
      * checks if the app has the location permission
@@ -70,8 +110,6 @@ class TrackingService : Service(), LocationListener {
      */
     private fun startTracking() {
         try {
-            locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
             if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { return }
 
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -89,16 +127,17 @@ class TrackingService : Service(), LocationListener {
      */
     override fun onLocationChanged(location: Location) {
         Log.i("onLocationChanged", "lat: ${location.latitude}, long: ${location.longitude}")
-        sendLocation(location)
+        gmsLocationList.add(location)
+        sendLocation()
     }
     
     /**
-     * sends an location to the parent activity/fragment
+     * sends an location ArrayList to the parent activity/fragment
      */
-    private fun sendLocation(location: Location) {
+    private fun sendLocation() {
         val intent = Intent().apply {
             action = LOCATION_EVENT
-            putExtra(LOCATION_KEY, location)
+            putExtra(LOCATION_KEY, gmsLocationList)
         }
 
         sendBroadcast(intent)
@@ -119,5 +158,6 @@ class TrackingService : Service(), LocationListener {
         if (locationManager != null) {
             locationManager.removeUpdates(this)
         }
+        notificationManager.cancel(NOTIFY_ID)
     }
 }
