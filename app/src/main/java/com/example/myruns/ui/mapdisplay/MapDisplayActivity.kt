@@ -306,7 +306,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun updateMap(exerciseEntry: ExerciseEntry?) {
         lifecycleScope.launch {
-            if (exerciseEntry == null) {
+            if (exerciseEntry == null || !::mMap.isInitialized) {
                 return@launch
             }
 

@@ -14,13 +14,13 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.myruns.ui.mapdisplay.MapDisplayActivity
+
 
 class TrackingService : Service(), LocationListener {
     companion object {
@@ -163,4 +163,9 @@ class TrackingService : Service(), LocationListener {
         }
         notificationManager.cancel(NOTIFY_ID)
     }
+
+    // 3 functions to stop fix crashing issue on api 24
+    override fun onProviderEnabled(provider: String) {}
+    override fun onProviderDisabled(provider: String) {}
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
 }
