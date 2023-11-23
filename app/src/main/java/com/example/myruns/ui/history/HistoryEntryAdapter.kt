@@ -11,8 +11,8 @@ import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.ui.SettingsFragment
 import com.example.myruns.ui.StartFragment
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
+import com.example.myruns.ui.mapdisplay.MapDisplayActivity
+import java.text.DecimalFormat
 
 /**
  * adapter for the RecyclerView in HistoryFragment
@@ -43,7 +43,12 @@ class ExerciseEntryAdapter(
         fun bind(exerciseEntry: ExerciseEntry) {
             // populate TextViews with ExerciseEntry data
             inputType.text = exerciseEntry.inputType
-            activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
+            if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
+                activityType.text = "Unknown"
+            } else {
+                println("activity type int ${exerciseEntry.activityType}")
+                activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
+            }
             dateTime.text = exerciseEntry.dateTime?.time.toString()
             
             val mins = (exerciseEntry.duration?.toInt()?.toString() ?: "0") + " mins"
@@ -51,12 +56,17 @@ class ExerciseEntryAdapter(
             val secs = ((exerciseEntry.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
             duration.text = mins + " " + secs
 
+            var formattedDistance = "0"
+            if (exerciseEntry.distance != null) {
+                val decimalFormat = DecimalFormat("#.######")
+                formattedDistance = decimalFormat.format(exerciseEntry.distance)
+            }
             // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->
                 if (unitPref == SettingsFragment.UNIT_METRIC) {
-                    distance.text = (exerciseEntry.distance?.toString() ?: "0") + " kilometers"
+                    distance.text = (formattedDistance?.toString() ?: "0") + " kilometers"
                 } else {
-                    distance.text = (exerciseEntry.distance?.toString() ?: "0") + " miles"
+                    distance.text = (formattedDistance?.toString() ?: "0") + " miles"
                 }
             }
         }
@@ -73,14 +83,20 @@ class ExerciseEntryAdapter(
         
         // click listener that opens HistoryEntryActivity
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, HistoryEntryActivity::class.java)
-            // sends a byte array of the ExerciseEntry to the HistoryEntryActivity
-            val byteArray = ByteArrayOutputStream()
-            val out = ObjectOutputStream(byteArray)
-            out.writeObject(exerciseEntry)
-            out.close()
-            intent.putExtra(HistoryEntryActivity.EXERCISE_ENTRY, byteArray.toByteArray())
+
+            // open HistoryEntryActivity or MapViewActivity based on ExerciseEntry inputType
+            val intent = if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_MANUAL) {
+                Intent(holder.itemView.context, HistoryEntryActivity::class.java).apply {
+                    putExtra(HistoryEntryActivity.EXERCISE_ENTRY, exerciseEntry)
+                }
+            } else {
+                Intent(holder.itemView.context, MapDisplayActivity::class.java).apply {
+                    putExtra(MapDisplayActivity.EXERCISE_ENTRY_KEY, exerciseEntry)
+                }
+            }
+
             holder.itemView.context.startActivity(intent)
+
         }
     }
 

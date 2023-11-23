@@ -13,15 +13,15 @@ import kotlinx.coroutines.launch
  * the dao for the ExerciseEntry database
  */
 class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
-    private val kmToMilesConversion = 0.621371
+    private val kmToMilesConversion = SettingsFragment.KM_TO_MILES
 
     /**
-     * returns a Flow of all comments in the database
+     * returns a Flow of all ExerciseEntries in the database
      * @param unitType 
      * the unit type to display the distance in
      * which should be either SettingsFragment.UNIT_METRIC or SettingsFragment.UNIT_IMPERIAL
      */
-    fun allComments(unitType: String): Flow<List<ExerciseEntry>> {
+    fun allExerciseEntries(unitType: String): Flow<List<ExerciseEntry>> {
         val exerciseEntries = exerciseDatabaseDao.getAllExercises()
         return if (unitType == SettingsFragment.UNIT_METRIC) {
             exerciseEntries
@@ -53,7 +53,6 @@ class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
             exerciseDatabaseDao.insertExercise(exerciseEntryCopy)
         }
     }
-
 
     /**
      * deletes an exercise entry from the database

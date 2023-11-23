@@ -56,7 +56,8 @@ class ManualInputViewModel(private val repository: ExerciseRepository): ViewMode
                 calories.value,
                 0.0,
                 heartRate.value,
-                comments.value
+                comments.value,
+                locationList = null
             ), it
             )
         }

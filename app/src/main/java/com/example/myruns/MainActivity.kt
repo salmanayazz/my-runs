@@ -1,6 +1,8 @@
 package com.example.myruns
 
+import android.Manifest
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
@@ -53,6 +55,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
         tabLayoutMediator.attach()
+
+        // request notification permissions
+        val notificationPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { }
+
+        notificationPermissionLauncher.launch(
+            Manifest.permission.POST_NOTIFICATIONS
+        )
     }
 
     override fun onDestroy() {

@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myruns.R
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseRepository
-import com.example.myruns.ui.ExerciseViewModelFactory
+import com.example.myruns.data.exercise.ExerciseViewModelFactory
 import com.example.myruns.ui.SettingsFragment
 
 /**

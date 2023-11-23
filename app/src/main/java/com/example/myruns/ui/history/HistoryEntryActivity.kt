@@ -9,14 +9,13 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.example.myruns.R
+import com.example.myruns.Utils.getParcelableExtraCompat
 import com.example.myruns.data.exercise.ExerciseDatabase
 import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.data.exercise.ExerciseRepository
-import com.example.myruns.ui.ExerciseViewModelFactory
+import com.example.myruns.data.exercise.ExerciseViewModelFactory
 import com.example.myruns.ui.SettingsFragment
 import com.google.android.material.textfield.TextInputLayout
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
 import java.text.SimpleDateFormat
 
 /**
@@ -35,9 +34,6 @@ class HistoryEntryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_entry)
 
-        // get the ExerciseEntry as a byte array
-        val exerciseByteArr = intent.getByteArrayExtra(EXERCISE_ENTRY)
-
         // setup mvvm objects
         var database = ExerciseDatabase.getInstance(this)
         var databaseDao = database.exerciseDatabaseDao
@@ -48,16 +44,16 @@ class HistoryEntryActivity : AppCompatActivity() {
             viewModelFactory
         )[HistoryViewModel::class.java]
 
-        try {
-            // parse into ExerciseEntry if not null
-            exerciseEntry = ObjectInputStream(
-                ByteArrayInputStream(exerciseByteArr)
-            ).readObject() as ExerciseEntry
+        exerciseEntry = intent.getParcelableExtraCompat(
+            EXERCISE_ENTRY,
+            ExerciseEntry::class.java
+        )
 
-            populateText()
-        } catch (e: Exception) {
-            println(e.printStackTrace())
+        if (exerciseEntry == null) {
+            Log.e("HistoryEntryActivity", "passed ExerciseEntry is null")
         }
+
+        populateText()
 
         // delete entry onClick
         findViewById<ImageView>(R.id.delete_entry).setOnClickListener() {

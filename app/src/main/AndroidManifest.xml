@@ -7,6 +7,9 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -18,11 +21,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyRuns"
         tools:targetApi="31">
+        <service
+            android:name=".TrackingService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <activity
+            android:name=".ui.mapdisplay.MapDisplayActivity"
+            android:exported="false"
+            android:label="@string/title_activity_map_display"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.history.HistoryEntryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MapDisplayActivity"
             android:exported="false" />
         <activity
             android:name=".ui.manualinput.ManualInputActivity"
