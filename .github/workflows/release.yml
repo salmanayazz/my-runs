@@ -1,17 +1,35 @@
 name: release
 
 on:
-  release:
-    types:
-      - created
+    release:
+      types:
+        - created
+  
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK and Gradle
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Add secrets to local.properties
+      run: echo MAPS_API_KEY="${{ secrets.MAPS_API_KEY }}" > ./local.properties
+
     - name: Build
-      uses: ./build.yml
+      run: |
+        ./gradlew clean assembleDebug
 
     - name: Upload Release Asset
       id: create_release
