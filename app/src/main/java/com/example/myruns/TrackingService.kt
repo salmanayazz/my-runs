@@ -14,7 +14,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -42,6 +41,7 @@ class TrackingService : Service(), LocationListener {
         checkPermission()
         val filter = IntentFilter(STOP_SERVICE_ACTION)
         registerReceiver(stopServiceReceiver, filter)
+        isReceiverRegistered = true
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -152,6 +152,7 @@ class TrackingService : Service(), LocationListener {
                 // stop this service when parent activity/fragment sends a broadcast to stop
                 stopSelf()
                 unregisterReceiver(stopServiceReceiver)
+                isReceiverRegistered = false
             }
         }
     }
@@ -162,10 +163,9 @@ class TrackingService : Service(), LocationListener {
             locationManager.removeUpdates(this)
         }
         notificationManager.cancel(NOTIFY_ID)
-    }
 
-    // 3 functions to stop fix crashing issue on api 24
-    override fun onProviderEnabled(provider: String) {}
-    override fun onProviderDisabled(provider: String) {}
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        if (isReceiverRegistered) {
+            unregisterReceiver(stopServiceReceiver)
+        }
+    }
 }

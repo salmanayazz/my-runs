@@ -1,6 +1,5 @@
 package com.example.myruns.ui.history
 
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,8 +16,6 @@ import com.example.myruns.data.exercise.ExerciseRepository
 import com.example.myruns.data.exercise.ExerciseViewModelFactory
 import com.example.myruns.ui.SettingsFragment
 import com.google.android.material.textfield.TextInputLayout
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
 import java.text.SimpleDateFormat
 
 /**

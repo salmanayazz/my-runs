@@ -59,7 +59,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private var mapCentered = false
-    
+
     private val exerciseStats by lazy { findViewById<TextView>(R.id.exercise_stats) }
     private var inputType: String = StartFragment.inputTypeList[0]
     private var activityType: Int = 0
@@ -286,7 +286,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         return  ExerciseEntry(
             0,
             inputType,
-            0,
+            activityType,
             Calendar.getInstance(),
             (Calendar.getInstance().timeInMillis - timeStarted).toDouble() / (1000 * 60), // convert milisec to mins
             distance,
@@ -424,7 +424,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onResume()
 
         if (!staticMap && hasStarted) {
-            println("I HAVE STARTED")
             checkPermission()
         }
 
@@ -433,14 +432,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         registerReceiver(locationReceiver, filter)
     }
 
-    override fun onPause() {
-        super.onPause()
-        // stop the tracking service receiver
-        unregisterReceiver(locationReceiver)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
+        // stop the tracking service receiver
+        unregisterReceiver(locationReceiver)
         stopTrackingService()
     }
 }

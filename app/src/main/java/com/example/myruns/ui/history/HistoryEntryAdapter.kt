@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myruns.R
@@ -13,8 +12,6 @@ import com.example.myruns.data.exercise.ExerciseEntry
 import com.example.myruns.ui.SettingsFragment
 import com.example.myruns.ui.StartFragment
 import com.example.myruns.ui.mapdisplay.MapDisplayActivity
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
 import java.text.DecimalFormat
 
 /**
@@ -49,6 +46,7 @@ class ExerciseEntryAdapter(
             if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
                 activityType.text = "Unknown"
             } else {
+                println("activity type int ${exerciseEntry.activityType}")
                 activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             }
             dateTime.text = exerciseEntry.dateTime?.time.toString()
@@ -58,8 +56,11 @@ class ExerciseEntryAdapter(
             val secs = ((exerciseEntry.duration?.rem(1.0) ?: 0.0) * 60).toInt().toString() + " secs"
             duration.text = mins + " " + secs
 
-            val decimalFormat = DecimalFormat("#.######")
-            val formattedDistance = decimalFormat.format(exerciseEntry.distance)
+            var formattedDistance = "0"
+            if (exerciseEntry.distance != null) {
+                val decimalFormat = DecimalFormat("#.######")
+                formattedDistance = decimalFormat.format(exerciseEntry.distance)
+            }
             // observer for the unit preference
             historyViewModel.unitPreference.observe(itemView.context as LifecycleOwner) { unitPref ->
                 if (unitPref == SettingsFragment.UNIT_METRIC) {
