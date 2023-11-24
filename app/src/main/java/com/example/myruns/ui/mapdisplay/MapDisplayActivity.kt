@@ -30,6 +30,7 @@ import com.example.myruns.databinding.ActivityMapDisplayBinding
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 import android.location.Location
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.preference.PreferenceManager
@@ -58,7 +59,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapDisplayViewModel: MapDisplayViewModel
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
-    private var mapCentered = false
 
     private val exerciseStats by lazy { findViewById<TextView>(R.id.exercise_stats) }
     private var inputType: String = StartFragment.inputTypeList[0]
@@ -70,6 +70,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private val metersPerSecToKmPerHour = 3.6
     private var hasStarted = false
     private val timeStarted = Calendar.getInstance().timeInMillis
+    private lateinit var appContext: Context
+    private var trackerIsBinded = false
+    private val BIND_STATUS_KEY = "bind-status-key"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +105,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
+        appContext = this.applicationContext
+
         checkPermission()
 
         val intentInputType = intent.getStringExtra(INPUT_TYPE_KEY)
@@ -110,6 +115,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             inputType = intentInputType
         }
         activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
+
+        if(savedInstanceState != null) {
+            trackerIsBinded = savedInstanceState.getBoolean(BIND_STATUS_KEY)
+        }
 
     }
 
@@ -207,38 +216,21 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun startTrackingService() {
-        println("I HAVE STARTED 2")
-        val serviceIntent = Intent(this, TrackingService::class.java)
-        this.startService(serviceIntent)
-        hasStarted = true
-    }
-
-    private fun stopTrackingService() {
-        val intent = Intent()
-        intent.action = TrackingService.STOP_SERVICE_ACTION
-        sendBroadcast(intent)
-    }
-
     /**
-     * the receiver for ExerciseEntry events from the TrackingService
+     * starts the tracking service and binds it to this activity
      */
-    private val locationReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent?.let {
-                if (it.action != TrackingService.LOCATION_EVENT) { return }
+    private fun startTrackingService() {
+        intent = Intent(this, TrackingService::class.java)
+        this.startService(intent)
+        hasStarted = true
+        bindService()
 
-                // get google maps service location from service
-                gmsLocationList = (intent.getParcelableArrayListCompat(
-                    TrackingService.LOCATION_KEY,
-                    Location::class.java
-                ) ?: return) as ArrayList<Location>
+        mapDisplayViewModel.gmsLocationList.observe(this) {
+            if (it == null || it.isEmpty()) { return@observe }
+            exerciseEntry = gmsLocationToExerciseActivity(it)
 
-                exerciseEntry = gmsLocationToExerciseActivity(gmsLocationList)
-
-                updateMap(exerciseEntry)
-                updateExerciseStats(exerciseEntry)
-            }
+            updateMap(exerciseEntry)
+            updateExerciseStats(exerciseEntry)
         }
     }
 
@@ -426,16 +418,41 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!staticMap && hasStarted) {
             checkPermission()
         }
+    }
 
-        // restart the tracking service receiver
-        val filter = IntentFilter(TrackingService.LOCATION_EVENT)
-        registerReceiver(locationReceiver, filter)
+    /**
+     * binds the tracking service to this activity
+     * if the service is already binded then do nothing
+     */
+    private fun bindService() {
+        if (!trackerIsBinded) {
+            appContext.bindService(intent, mapDisplayViewModel, Context.BIND_AUTO_CREATE)
+            trackerIsBinded = true
+        }
+    }
+
+    /**
+     * unbinds the tracking service from this activity
+     * if the service is not binded then do nothing
+     */
+    private fun unBindService(){
+        if (trackerIsBinded) {
+            appContext.unbindService(mapDisplayViewModel)
+            trackerIsBinded = false
+        }
+    }
+
+    /**
+     * saves the bind status of the tracking service
+     */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(BIND_STATUS_KEY, trackerIsBinded)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // stop the tracking service receiver
-        unregisterReceiver(locationReceiver)
-        stopTrackingService()
+        unBindService()
+        this.stopService(intent)
     }
 }

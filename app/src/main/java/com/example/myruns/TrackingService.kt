@@ -13,7 +13,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Binder
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -23,24 +26,20 @@ import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 
 class TrackingService : Service(), LocationListener {
     companion object {
-        val LOCATION_EVENT = "exercise-entry-event"
-        val LOCATION_KEY = "exercise-entry-key"
-
-        val STOP_SERVICE_ACTION = "stop-service-action"
+        val MSG_LOCATION_VALUE = 0
+        val LOCATION_KEY = "location-key"
     }
 
+    private var messageHandler: Handler? = null
     private val CHANNEL_ID = "Tracking Notification"
     private val NOTIFY_ID = 1
-    private val stopServiceReceiver by lazy { StopServiceReceiver() }
     private var isReceiverRegistered = false
     private val locationManager by lazy { getSystemService(LOCATION_SERVICE) as LocationManager }
-    val gmsLocationList = ArrayList<Location>()
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+    private val trackingBinder by lazy { TrackingBinder() }
 
     override fun onCreate() {
         checkPermission()
-        val filter = IntentFilter(STOP_SERVICE_ACTION)
-        registerReceiver(stopServiceReceiver, filter)
         isReceiverRegistered = true
     }
 
@@ -52,8 +51,20 @@ class TrackingService : Service(), LocationListener {
         return START_STICKY
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return null
+    override fun onBind(intent: Intent?): IBinder? {
+        return trackingBinder
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        messageHandler = null
+        return true
+    }
+
+    inner class TrackingBinder : Binder() {
+        fun setMessageHandler(messageHandler: Handler) {
+            Log.i("Tracking Service", "setMessageHandler has been called")
+            this@TrackingService.messageHandler = messageHandler
+        }
     }
 
     /**
@@ -116,7 +127,12 @@ class TrackingService : Service(), LocationListener {
             if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { return }
 
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                0,
+                0f,
+                this
+            )
 
         } catch (e: SecurityException) {
             e.printStackTrace()
@@ -130,30 +146,22 @@ class TrackingService : Service(), LocationListener {
      */
     override fun onLocationChanged(location: Location) {
         Log.i("onLocationChanged", "lat: ${location.latitude}, long: ${location.longitude}")
-        gmsLocationList.add(location)
-        sendLocation()
+        sendLocation(location)
     }
     
     /**
-     * sends an location ArrayList to the parent activity/fragment
+     * sends an location to the parent message handler
      */
-    private fun sendLocation() {
-        val intent = Intent().apply {
-            action = LOCATION_EVENT
-            putExtra(LOCATION_KEY, gmsLocationList)
-        }
+    private fun sendLocation(location: Location) {
+        if(messageHandler != null) {
+            val bundle = Bundle()
+            bundle.putParcelable(LOCATION_KEY, location)
+            val message = messageHandler!!.obtainMessage()
 
-        sendBroadcast(intent)
-    }
+            message.data = bundle
+            message.what = MSG_LOCATION_VALUE
+            messageHandler?.sendMessage(message)
 
-   inner class StopServiceReceiver: BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == STOP_SERVICE_ACTION) {
-                // stop this service when parent activity/fragment sends a broadcast to stop
-                stopSelf()
-                unregisterReceiver(stopServiceReceiver)
-                isReceiverRegistered = false
-            }
         }
     }
 
@@ -163,9 +171,5 @@ class TrackingService : Service(), LocationListener {
             locationManager.removeUpdates(this)
         }
         notificationManager.cancel(NOTIFY_ID)
-
-        if (isReceiverRegistered) {
-            unregisterReceiver(stopServiceReceiver)
-        }
     }
 }
