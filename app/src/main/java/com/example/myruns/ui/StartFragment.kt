@@ -14,11 +14,6 @@ import com.example.myruns.R
 import com.example.myruns.ui.manualinput.ManualInputActivity
 import com.example.myruns.ui.mapdisplay.MapDisplayActivity
 
-/**
- * A simple [Fragment] subclass.
- * Use the [StartFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class StartFragment : Fragment() {
     companion object {
         val inputTypeList = listOf("Manual Entry", "GPS", "Automatic")
@@ -87,10 +82,13 @@ class StartFragment : Fragment() {
             val intent = if (inputTypeList[selectedInput] == INPUT_TYPE_MANUAL) {
                 Intent(requireContext(), ManualInputActivity::class.java)
                     .putExtra(ManualInputActivity.ACTIVITY_TYPE_KEY, selectedActivity)
+            } else if (inputTypeList[selectedInput] == INPUT_TYPE_GPS) {
+                Intent(requireContext(), MapDisplayActivity::class.java)
+                    .putExtra(MapDisplayActivity.INPUT_TYPE_KEY, INPUT_TYPE_GPS)
+                    .putExtra(MapDisplayActivity.ACTIVITY_TYPE_KEY, selectedActivity)
             } else {
                 Intent(requireContext(), MapDisplayActivity::class.java)
-                    .putExtra(MapDisplayActivity.INPUT_TYPE_KEY, inputTypeList[selectedInput])
-                    .putExtra(MapDisplayActivity.ACTIVITY_TYPE_KEY, selectedActivity)
+                    .putExtra(MapDisplayActivity.INPUT_TYPE_KEY, INPUT_TYPE_AUTOMATIC)
             }
             startActivity(intent)
         }

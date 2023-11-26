@@ -105,16 +105,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        appContext = this.applicationContext
-
-        checkPermission()
-
         val intentInputType = intent.getStringExtra(INPUT_TYPE_KEY)
 
         if (intentInputType != null) {
             inputType = intentInputType
         }
-        activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
+        activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, -1)
+
+        appContext = this.applicationContext
+
+        checkPermission()
 
         if(savedInstanceState != null) {
             trackerIsBinded = savedInstanceState.getBoolean(BIND_STATUS_KEY)
@@ -220,7 +220,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
      * starts the tracking service and binds it to this activity
      */
     private fun startTrackingService() {
+        println("inputType ${inputType} & ${inputType == StartFragment.INPUT_TYPE_AUTOMATIC}")
         intent = Intent(this, TrackingService::class.java)
+            .putExtra(TrackingService.DETECT_ACTIVITY, inputType == StartFragment.INPUT_TYPE_AUTOMATIC)
         this.startService(intent)
         hasStarted = true
         bindService()
@@ -231,6 +233,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
             updateMap(exerciseEntry)
             updateExerciseStats(exerciseEntry)
+        }
+
+        mapDisplayViewModel.detectedActivity.observe(this) {
+            activityType = it
         }
     }
 
@@ -368,7 +374,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             unitPerHour = "m/h"
         }
 
-        var text = if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
+        var text = if (activityType < 0 || activityType > StartFragment.activityTypeList.size) {
             "Activity Type: Unknown\n"
         } else {
             "Activity Type: ${StartFragment.activityTypeList[activityType]}\n"

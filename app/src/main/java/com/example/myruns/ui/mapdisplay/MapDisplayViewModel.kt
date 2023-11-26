@@ -25,7 +25,16 @@ class MapDisplayViewModel(
     // the list of locations from the tracking service
     private val _gmsLocationList = MutableLiveData<ArrayList<Location>>()
     val gmsLocationList: LiveData<ArrayList<Location>>
-        get() = _gmsLocationList
+        get() {
+            return _gmsLocationList
+        }
+
+    private val _detectedActivity = MutableLiveData<Int>()
+    val detectedActivity: LiveData<Int>
+        get() {
+            return _detectedActivity
+        }
+
 
     inner class TrackingMessageHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message) {
@@ -39,6 +48,10 @@ class MapDisplayViewModel(
                 } else if (location != null) {
                     _gmsLocationList.value = ArrayList()
                 }
+            } else if (msg.what == TrackingService.MSG_ACTIVITY_VALUE) {
+                val bundle = msg.data
+                val activity = bundle.getInt(TrackingService.ACTIVITY_KEY)
+                _detectedActivity.value = activity
             }
         }
     }
