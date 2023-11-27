@@ -44,6 +44,7 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.VisibleRegion
 import java.text.DecimalFormat
+import kotlin.math.max
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
@@ -105,16 +106,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        appContext = this.applicationContext
-
-        checkPermission()
-
         val intentInputType = intent.getStringExtra(INPUT_TYPE_KEY)
 
         if (intentInputType != null) {
             inputType = intentInputType
         }
-        activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, 0)
+        activityType = intent.getIntExtra(ACTIVITY_TYPE_KEY, -1)
+
+        appContext = this.applicationContext
+
+        checkPermission()
 
         if(savedInstanceState != null) {
             trackerIsBinded = savedInstanceState.getBoolean(BIND_STATUS_KEY)
@@ -220,7 +221,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
      * starts the tracking service and binds it to this activity
      */
     private fun startTrackingService() {
+        println("inputType ${inputType} & ${inputType == StartFragment.INPUT_TYPE_AUTOMATIC}")
         intent = Intent(this, TrackingService::class.java)
+            .putExtra(TrackingService.DETECT_ACTIVITY, inputType == StartFragment.INPUT_TYPE_AUTOMATIC)
         this.startService(intent)
         hasStarted = true
         bindService()
@@ -231,6 +234,23 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
             updateMap(exerciseEntry)
             updateExerciseStats(exerciseEntry)
+        }
+
+
+        // calculate highest count for activity detection
+        var activityCounts = mutableMapOf(
+            0 to 0, // standing
+            1 to 0, // walking
+            2 to 0  // running
+        )
+
+        mapDisplayViewModel.detectedActivity.observe(this) { detectedActivity ->
+            activityCounts[detectedActivity] = activityCounts.getOrDefault(detectedActivity, 0) + 1
+
+            val maxActivity = activityCounts.maxByOrNull { it.value }?.key
+            if (maxActivity != null) {
+                activityType = maxActivity
+            }
         }
     }
 
@@ -368,7 +388,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             unitPerHour = "m/h"
         }
 
-        var text = if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
+        var text = if (activityType < 0 || activityType > StartFragment.activityTypeList.size) {
             "Activity Type: Unknown\n"
         } else {
             "Activity Type: ${StartFragment.activityTypeList[activityType]}\n"

@@ -43,12 +43,7 @@ class ExerciseEntryAdapter(
         fun bind(exerciseEntry: ExerciseEntry) {
             // populate TextViews with ExerciseEntry data
             inputType.text = exerciseEntry.inputType
-            if (exerciseEntry.inputType == StartFragment.INPUT_TYPE_AUTOMATIC) {
-                activityType.text = "Unknown"
-            } else {
-                println("activity type int ${exerciseEntry.activityType}")
-                activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
-            }
+            activityType.text = StartFragment.activityTypeList[exerciseEntry.activityType]
             dateTime.text = exerciseEntry.dateTime?.time.toString()
             
             val mins = (exerciseEntry.duration?.toInt()?.toString() ?: "0") + " mins"
