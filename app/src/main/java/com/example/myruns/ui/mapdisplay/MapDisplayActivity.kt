@@ -44,6 +44,7 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.VisibleRegion
 import java.text.DecimalFormat
+import kotlin.math.max
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
@@ -235,8 +236,21 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             updateExerciseStats(exerciseEntry)
         }
 
-        mapDisplayViewModel.detectedActivity.observe(this) {
-            activityType = it
+
+        // calculate highest count for activity detection
+        var activityCounts = mutableMapOf(
+            0 to 0, // standing
+            1 to 0, // walking
+            2 to 0  // running
+        )
+
+        mapDisplayViewModel.detectedActivity.observe(this) { detectedActivity ->
+            activityCounts[detectedActivity] = activityCounts.getOrDefault(detectedActivity, 0) + 1
+
+            val maxActivity = activityCounts.maxByOrNull { it.value }?.key
+            if (maxActivity != null) {
+                activityType = maxActivity
+            }
         }
     }
 
